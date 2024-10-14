@@ -5,6 +5,7 @@ import lombok.*;
 
 @Entity
 @Data
+
 public class Auction {
     
 }
