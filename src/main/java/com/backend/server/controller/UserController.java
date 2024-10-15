@@ -64,7 +64,7 @@ public class UserController {
             User u ;
             if(l.getEmail() != null) u = userSer.findOneByEmail(l.getEmail()) ;
             else if(l.getUsername() != null)  u = userSer.findOneByUsername(l.getUsername()) ;
-            else throw new Exception();
+            else return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 
 
             if( bCryptPasswordEncoder.matches(l.getPassword(), u.getPassword()) ){
