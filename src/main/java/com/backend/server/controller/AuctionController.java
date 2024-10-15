@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.security.auth.login.AccountNotFoundException;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,42 +21,35 @@ import com.backend.server.service.AuctionService;
 @RestController
 @RequestMapping(path="/auction")
 public class AuctionController {
-    public final AuctionService auctionService;
-
-    public AuctionController() {
-        this(null);
-    }
-
-    public AuctionController(AuctionService auctionService) {
-        this.auctionService = auctionService;
-    }
+    @Autowired
+    AuctionService auctionService;
 
     @GetMapping("/auctions")
     public List<Auction> getAuctions(){
-            return this.auctionService.getAuctions();
+            return auctionService.getAuctions();
     }
 
     @GetMapping("/auction/{id}")
     public Auction getAuction(@PathVariable Long id){
-        return  this.auctionService.getAuction(id);
+        return  auctionService.getAuction(id);
     }
 
     @PostMapping("/auction/add")
     public Auction addAuction(@RequestBody Auction auction){
-        return  this.auctionService.addAuction(auction);
+        return  auctionService.addAuction(auction);
     }
 
     @PutMapping("/auction/close/{id}")
     public void closeAuction(@PathVariable Long id)throws AccountNotFoundException{
-        this.auctionService.changeStatus(id,Auction.Status.CLOSED);
+        auctionService.changeStatus(id,Auction.Status.CLOSED);
     }
     @PutMapping("/auction/open/{id}")
     public void openAuction(@PathVariable Long id)throws AccountNotFoundException{
-        this.auctionService.changeStatus(id,Auction.Status.OPEN);
+        auctionService.changeStatus(id,Auction.Status.OPEN);
     }
     @PutMapping("/auction/cancel/{id}")
     public void cancelAuction(@PathVariable Long id)throws AccountNotFoundException{
-        this.auctionService.changeStatus(id,Auction.Status.CANCELED);
+        auctionService.changeStatus(id,Auction.Status.CANCELED);
     }
 
 
