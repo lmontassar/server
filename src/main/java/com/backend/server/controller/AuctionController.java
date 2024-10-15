@@ -18,7 +18,7 @@ import com.backend.server.service.AuctionService;
 
 
 @RestController
-@RequestMapping(path="api/auction")
+@RequestMapping(path="/auction")
 public class AuctionController {
     public final AuctionService auctionService;
 

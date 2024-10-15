@@ -15,7 +15,8 @@ public class Auction {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id ;
 
-    private Long seller_id;
+    @ManyToOne
+    private User seller;
     private String title;
     private String discription;
     private float start_price;
