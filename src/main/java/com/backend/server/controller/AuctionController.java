@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.backend.server.entity.Auction;
-import com.backend.server.entity.AuctionStatus;
 import com.backend.server.service.AuctionService;
 
 
@@ -48,7 +47,7 @@ public class AuctionController {
 
     @PutMapping("/auction/close/{id}")
     public void closeAuction(@PathVariable Long id)throws AccountNotFoundException{
-        this.auctionService.changeStatus(id,AuctionStatus.CLOSED);
+        this.auctionService.changeStatus(id,Auction.Status.CLOSED);
     }
 
 

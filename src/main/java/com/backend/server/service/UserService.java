@@ -3,6 +3,7 @@ package com.backend.server.service;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.backend.server.repository.AuctionRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -11,6 +12,7 @@ import com.backend.server.repository.UserRepo;
 
 @Service
 public class UserService {
+
     @Autowired
     private UserRepo repo;
 
@@ -18,6 +20,6 @@ public class UserService {
         return repo.findById(id).orElse(null);
     }
     public List<User> findAll(){
-        return repo.findAll().orELse(null);
+        return repo.findAll();
     }
 }

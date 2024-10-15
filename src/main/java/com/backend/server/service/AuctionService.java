@@ -1,7 +1,6 @@
 package com.backend.server.service;
 
 import com.backend.server.entity.Auction;
-import com.backend.server.entity.AuctionStatus;
 import com.backend.server.repository.AuctionRepo;
 import org.springframework.stereotype.Service;
 
@@ -27,7 +26,7 @@ public class AuctionService {
     {
         return auctionRepo.save(auction);
     }
-    public void changeStatus(Long id , AuctionStatus status){
+    public void changeStatus(Long id , Auction.Status status){
         Auction auction = getAuction(id);
         auction.setStatus(status);
     }

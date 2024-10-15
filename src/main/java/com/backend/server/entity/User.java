@@ -23,14 +23,18 @@ public class User {
     private String username;
     private String password;
     private String email;
-    @Enumerated(EnumType.STRING)
+    public enum Role {
+        ADMIN,SELLER,BUYER
+    }
     private Role role;
     private String firstname;
     private String lastname;
     private int number;
     private String address;
     private Date created_at;
-    @Enumerated(EnumType.STRING)
+    public enum Status {
+        ACTIVE,BLOCKED
+    }
     private Status status;
     private String imageurl;
 }

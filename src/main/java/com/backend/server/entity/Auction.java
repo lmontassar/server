@@ -20,7 +20,11 @@ public class Auction {
     private float current_price;
     private Date start_time;
     private Date end_time;
+    public enum Status {
+        OPEN,
+        CLOSED,
+        CANCELED
+    }
 
-    @Enumerated(EnumType.STRING)
-    private AuctionStatus status;
+    private Status status;
 }
