@@ -65,8 +65,11 @@ public class UserController {
             if(l.getEmail() != null) u = userSer.findOneByEmail(l.getEmail()) ;
             else if(l.getUsername() != null)  u = userSer.findOneByUsername(l.getUsername()) ;
             else throw new Exception();
-            if( bCryptPasswordEncoder.encode(l.getPassword()).equals(u.getPassword()) ){
+
+
+            if( bCryptPasswordEncoder.matches(l.getPassword(), u.getPassword()) ){
                 String jwt = myJwt.generateToken(u);
+                
                 LoginResponse Lr = new LoginResponse(jwt);
                 return ResponseEntity.status(HttpStatus.ACCEPTED).body(Lr);
             } else {
