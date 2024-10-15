@@ -27,7 +27,7 @@ public class UserController {
     @GetMapping("/get/all")
     public ResponseEntity<?> getOneById(){
         try{
-            User u = userSer.findAll() ;
+            User u = userSer.findAll();
             return ResponseEntity.accepted().body(u);
         }catch(Exception e){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
