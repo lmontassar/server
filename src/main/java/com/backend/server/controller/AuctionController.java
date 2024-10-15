@@ -49,6 +49,14 @@ public class AuctionController {
     public void closeAuction(@PathVariable Long id)throws AccountNotFoundException{
         this.auctionService.changeStatus(id,Auction.Status.CLOSED);
     }
+    @PutMapping("/auction/open/{id}")
+    public void openAuction(@PathVariable Long id)throws AccountNotFoundException{
+        this.auctionService.changeStatus(id,Auction.Status.OPEN);
+    }
+    @PutMapping("/auction/cancel/{id}")
+    public void cancelAuction(@PathVariable Long id)throws AccountNotFoundException{
+        this.auctionService.changeStatus(id,Auction.Status.CANCELED);
+    }
 
 
 
