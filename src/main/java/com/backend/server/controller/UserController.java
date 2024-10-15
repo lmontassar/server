@@ -33,40 +33,4 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
-    @GetMapping("/get/{id}")
-    public ResponseEntity<?> getOneById(Long id){
-        try{
-            User u = userSer.findById(id) ;
-            return ResponseEntity.accepted().body(u);
-        }catch(Exception e){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
-    }
-    @GetMapping("/get/{id}")
-    public ResponseEntity<?> getOneById(Long id){
-        try{
-            User u = userSer.findById(id) ;
-            return ResponseEntity.accepted().body(u);
-        }catch(Exception e){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
-    }
-    @GetMapping("/get/{id}")
-    public ResponseEntity<?> getOneById(Long id){
-        try{
-            User u = userSer.findById(id) ;
-            return ResponseEntity.accepted().body(u);
-        }catch(Exception e){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
-    }
-    @GetMapping("/get/{id}")
-    public ResponseEntity<?> getOneById(Long id){
-        try{
-            User u = userSer.findById(id) ;
-            return ResponseEntity.accepted().body(u);
-        }catch(Exception e){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
-    }
 }
