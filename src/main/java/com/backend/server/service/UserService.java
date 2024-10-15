@@ -41,4 +41,13 @@ public class UserService {
         u.setImageurl(upUser.getImageurl());
         return repo.save(u);
     }
+    public User save(User u){
+        return repo.save(u);
+    }
+    public User findOneByEmail(String email){
+        return repo.findOneByEmail(email);
+    }
+    public User findOneByUsername(String username){
+        return repo.findOneByUsername(username);
+    }
 }
