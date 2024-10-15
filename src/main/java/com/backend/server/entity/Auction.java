@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 import java.util.Date;
 @Entity
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class Auction {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

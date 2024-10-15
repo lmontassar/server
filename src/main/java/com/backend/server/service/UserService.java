@@ -1,9 +1,8 @@
 package com.backend.server.service;
 
-import java.util.ArrayList;
+
 import java.util.List;
 
-import com.backend.server.repository.AuctionRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
