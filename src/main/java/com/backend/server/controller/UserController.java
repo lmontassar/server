@@ -55,7 +55,6 @@ public class UserController {
             JSONObject ExistResponse = new JSONObject();
             ExistResponse.put("message", "Your e-mail or username already used!");
             ExistResponse.put("status", "error");
-
             if( userSer.findOneByEmail(u.getEmail()) != null || userSer.findOneByEmail(u.getEmail()) != null )
                 return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(ExistResponse.toString()); // 406
             u.setPassword(bCryptPasswordEncoder.encode(u.getPassword()));
@@ -73,8 +72,6 @@ public class UserController {
             if(l.getEmail() != null) u = userSer.findOneByEmail(l.getEmail()) ;
             else if(l.getUsername() != null)  u = userSer.findOneByUsername(l.getUsername()) ;
             else return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-
-
             if( bCryptPasswordEncoder.matches(l.getPassword(), u.getPassword()) ){
                 String jwt = myJwt.generateToken(u);
                 
@@ -91,10 +88,13 @@ public class UserController {
     @PutMapping("/update/{id}")
     public ResponseEntity<?> BlockOneById(@PathVariable("id") Long id,@RequestBody User u){
         try{
-            userSer.updateById(id,u);
-            return ResponseEntity.accepted().body(u);
+            if(u.getPassword() != null)
+                u.setPassword(bCryptPasswordEncoder.encode(u.getPassword()));
+            User UserAfterUpdates = userSer.updateById(id,u);
+            return ResponseEntity.accepted().body(UserAfterUpdates);
         }catch(Exception e){
-            return ResponseEntity.badRequest().build();
+            System.out.println(e.getMessage());
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 }

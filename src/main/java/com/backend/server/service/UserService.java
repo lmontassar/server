@@ -1,11 +1,10 @@
 package com.backend.server.service;
+import org.springframework.beans.BeanUtils;
 
-
+import java.util.Arrays;
 import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import com.backend.server.entity.User;
 import com.backend.server.repository.UserRepo;
 
@@ -28,17 +27,8 @@ public class UserService {
     }
     public User updateById(Long id,User upUser){
         User u = repo.findById(id).orElse(null);
-        u.setUsername(upUser.getUsername());
-        u.setPassword(upUser.getPassword());
-        u.setEmail(upUser.getEmail());
-        u.setRole(upUser.getRole());
-        u.setFirstname(upUser.getFirstname());
-        u.setLastname(upUser.getLastname());
-        u.setNumber(upUser.getNumber());
-        u.setAddress(upUser.getAddress());
-        u.setCreated_at(upUser.getCreated_at());
-        u.setStatus(upUser.getStatus());
-        u.setImageurl(upUser.getImageurl());
+        if (u == null) return null;
+        BeanUtils.copyProperties(upUser, u , getNullPropertyNames(upUser) );
         return repo.save(u);
     }
     public User save(User u){
@@ -49,5 +39,17 @@ public class UserService {
     }
     public User findOneByUsername(String username){
         return repo.findOneByUsername(username);
+    }
+    
+    private String[] getNullPropertyNames(Object source) {
+        return Arrays.stream(BeanUtils.getPropertyDescriptors(source.getClass()))
+                     .map(pd -> pd.getName())
+                     .filter(name -> {
+                         try {
+                             return BeanUtils.getPropertyDescriptor(source.getClass(), name).getReadMethod().invoke(source) == null;
+                         } catch (Exception e) {
+                             return false;
+                         }
+                     }).toArray(String[]::new);
     }
 }
