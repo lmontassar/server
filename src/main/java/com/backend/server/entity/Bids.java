@@ -1,7 +1,5 @@
 package com.backend.server.entity;
-
-import org.springframework.format.annotation.DateTimeFormat;
-
+import java.time.LocalDateTime;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -18,11 +16,11 @@ import lombok.NoArgsConstructor;
 public class Bids {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long bid_id;
+    private Long id;
     @ManyToOne
     private Auction auction;
     @ManyToOne
     private User buyer;
-    private double bid_amount;
-    private DateTimeFormat bid_time; 
+    private double amount;
+    private LocalDateTime time; 
 }

@@ -34,11 +34,11 @@ public class BidsService {
     }
 
     public List<Bids> getAllBidsByAuction(Auction a){
-        return bidsRepo.findAllByAuction(a);
+        return bidsRepo.findByAuction(a);
     }
 
     public List<Bids> getAllBidsByUser(User u){
-        return bidsRepo.findAllByUser(u);
+        return bidsRepo.findByBuyer(u);
     }
 
     public void DeleteBid(Bids b){
