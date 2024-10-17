@@ -42,10 +42,8 @@ public class BidsService {
     }
 
     public void DeleteBid(Bids b){
-        
         bidsRepo.delete(b);
     }
-    
 
 
 }

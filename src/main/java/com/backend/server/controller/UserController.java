@@ -1,5 +1,7 @@
 package com.backend.server.controller;
 import java.util.List;
+
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,7 +13,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.backend.server.config.JWT;
 import com.backend.server.entity.LoginRequest;
 import com.backend.server.entity.LoginResponse;
@@ -51,6 +52,12 @@ public class UserController {
     @PostMapping("/signup")
     public ResponseEntity<?> SignUp(@RequestBody User u){
         try{
+            JSONObject ExistResponse = new JSONObject();
+            ExistResponse.put("message", "Your e-mail or username already used!");
+            ExistResponse.put("status", "error");
+
+            if( userSer.findOneByEmail(u.getEmail()) != null || userSer.findOneByEmail(u.getEmail()) != null )
+                return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(ExistResponse.toString()); // 406
             u.setPassword(bCryptPasswordEncoder.encode(u.getPassword()));
             userSer.save(u);
             return ResponseEntity.accepted().build();
