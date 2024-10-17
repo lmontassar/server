@@ -82,7 +82,7 @@ public class UserController {
     }
     
     @PutMapping("/update/{id}")
-    public ResponseEntity<?> BlockOneById(Long id,@RequestBody User u){
+    public ResponseEntity<?> BlockOneById(@PathVariable("id") Long id,@RequestBody User u){
         try{
             userSer.updateById(id,u);
             return ResponseEntity.accepted().body(u);

@@ -4,6 +4,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
@@ -16,7 +17,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class Bids {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long bid_id;
     @ManyToOne
     private Auction auction;
@@ -24,5 +25,4 @@ public class Bids {
     private User buyer;
     private double bid_amount;
     private DateTimeFormat bid_time; 
-    
 }
