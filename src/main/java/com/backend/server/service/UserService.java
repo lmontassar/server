@@ -22,6 +22,7 @@ public class UserService {
     }
     public User BlockById(Long id){
         User u = repo.findById(id).orElse(null);
+
         u.setStatus(User.Status.BLOCKED);
         return repo.save(u);
     }

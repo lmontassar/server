@@ -1,57 +1,55 @@
 package com.backend.server.controller;
 
+import com.backend.server.entity.Auction;
+import com.backend.server.service.AuctionService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-import javax.security.auth.login.AccountNotFoundException;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import com.backend.server.entity.Auction;
-import com.backend.server.service.AuctionService;
-
-
 @RestController
-@RequestMapping(path="/auction")
+@RequestMapping(path = "/auction")
 public class AuctionController {
+
     @Autowired
-    AuctionService auctionService;
+    private AuctionService auctionService;
 
-    @GetMapping("/auctions")
-    public List<Auction> getAuctions(){
-            return auctionService.getAuctions();
-    }
-
-    @GetMapping("/auction/{id}")
-    public Auction getAuction(@PathVariable Long id){
-        return  auctionService.getAuction(id);
+    @GetMapping("/all")
+    public List<Auction> getAuctions() {
+        return auctionService.getAuctions();
     }
 
-    @PostMapping("/auction/add")
-    public Auction addAuction(@RequestBody Auction auction){
-        return  auctionService.addAuction(auction);
+    @PostMapping("/add")
+    @ResponseStatus(HttpStatus.CREATED) // Set response status to 201
+    public Auction addAuction(@RequestBody Auction auction) {
+        return auctionService.addAuction(auction);
     }
 
-    @PutMapping("/auction/close/{id}")
-    public void closeAuction(@PathVariable Long id)throws AccountNotFoundException{
-        auctionService.changeStatus(id,Auction.Status.CLOSED);
-    }
-    @PutMapping("/auction/open/{id}")
-    public void openAuction(@PathVariable Long id)throws AccountNotFoundException{
-        auctionService.changeStatus(id,Auction.Status.OPEN);
-    }
-    @PutMapping("/auction/cancel/{id}")
-    public void cancelAuction(@PathVariable Long id)throws AccountNotFoundException{
-        auctionService.changeStatus(id,Auction.Status.CANCELED);
+    @GetMapping("/{id}")
+    public ResponseEntity<Auction> getAuction(@PathVariable Long id) {
+        Auction auction = auctionService.getAuction(id);
+        if (auction != null) {
+            return ResponseEntity.ok(auction);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
     }
 
 
+    @PutMapping("/close/{id}")
+    public void closeAuction(@PathVariable Long id) {
+        auctionService.changeStatus(id, Auction.Status.CLOSED);
+    }
 
+    @PutMapping("/open/{id}")
+    public void openAuction(@PathVariable Long id) {
+        auctionService.changeStatus(id, Auction.Status.OPEN);
+    }
+
+    @PutMapping("/cancel/{id}")
+    public void cancelAuction(@PathVariable Long id) {
+        auctionService.changeStatus(id, Auction.Status.CANCELED);
+    }
 }

@@ -1,38 +1,52 @@
 package com.backend.server.entity;
 
-import java.util.Date;
-
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Data
+import java.time.LocalDateTime;
+
 @Entity
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Table(name = "users")
 public class User {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_seq_gen")
+    @SequenceGenerator(name = "user_seq_gen", sequenceName = "user_seq", allocationSize = 1)
     private Long id;
+
+    public enum Role {
+        ADMIN, USER
+    }
+
+    public enum Status {
+        ACTIVE, BLOCKED
+    }
+
     private String username;
     private String password;
     private String email;
-    public enum Role {
-        ADMIN,SELLER,BUYER
-    }
+
+    @Enumerated(EnumType.STRING)
     private Role role;
+
     private String firstname;
     private String lastname;
-    private int number;
+
+    private Integer phoneNumber; // Change from number to phoneNumber
+
     private String address;
-    private Date created_at;
-    public enum Status {
-        ACTIVE,BLOCKED
-    }
+
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
+    @Enumerated(EnumType.STRING)
     private Status status;
-    private String imageurl;
+
+    @Column(name = "image_url", length = 255)
+    private String imageUrl;
 }
+
