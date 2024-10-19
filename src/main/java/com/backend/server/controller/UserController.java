@@ -1,18 +1,24 @@
 package com.backend.server.controller;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
-
 import org.json.JSONObject;
-
+import org.springframework.core.io.Resource; // For Resource type
+import org.springframework.core.io.UrlResource; // For UrlResource
+import org.springframework.http.HttpHeaders; // For HTTP headers
+import org.springframework.http.ResponseEntity; // For ResponseEntity
+import org.springframework.web.bind.annotation.GetMapping; // For handling GET requests
+import org.springframework.web.bind.annotation.PathVariable; // For accessing path variables
+import org.springframework.web.bind.annotation.RestController; // For marking the class as a REST controller
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
@@ -73,7 +79,14 @@ public class UserController {
         return newFilename;
     }
 
-
+    @GetMapping("/upload/avatar/{imageName:.+}")
+    public ResponseEntity<Resource> serveFile(@PathVariable String imageName) throws MalformedURLException {
+        Path file = Paths.get("upload/avatar/" + imageName);
+        Resource resource = new UrlResource(file.toUri());
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
+                .body(resource);
+    }
 
     @PostMapping("/signup")
     public ResponseEntity<?> SignUp(
