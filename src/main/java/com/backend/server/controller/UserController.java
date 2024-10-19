@@ -1,28 +1,29 @@
 package com.backend.server.controller;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Objects;
 
 import org.json.JSONObject;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.*;
 import com.backend.server.config.JWT;
 import com.backend.server.entity.LoginRequest;
 import com.backend.server.entity.LoginResponse;
 import com.backend.server.entity.User;
 import com.backend.server.service.UserService;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping(path="/user")
@@ -54,25 +55,70 @@ public class UserController {
             return ResponseEntity.badRequest().build();
         }
     }
-    @PostMapping("/signup")
-    public ResponseEntity<?> SignUp(@RequestBody User u){
-        try{
-            JSONObject ExistResponse = new JSONObject();
 
-            ExistResponse.put("message", "Your e-mail or username already used!");
-            ExistResponse.put("status", "error");
-            if( userSer.findOneByEmail(u.getEmail()) != null || userSer.findOneByEmail(u.getEmail()) != null )
-                return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(ExistResponse.toString()); // 406
-            u.setStatus(User.Status.BLOCKED);
-            u.setRole(User.Role.USER);
+    private String saveUserImage(MultipartFile image) throws IOException {
+        // Define the directory where the images will be stored
+        String uploadDir = "upload/avatar/";
+
+        // Create the directory if it doesn't exist
+        Files.createDirectories(Paths.get(uploadDir));
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
+        // Create a unique image name (avatar-{userId}.extension)
+        String originalFilename = StringUtils.cleanPath(Objects.requireNonNull(image.getOriginalFilename()));
+        String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
+        String newFilename = "avatar-" + LocalDateTime.now().format(formatter) + extension;
+
+        // Save the file to the target directory
+        Files.copy(image.getInputStream(), Paths.get(uploadDir + newFilename), StandardCopyOption.REPLACE_EXISTING);
+        return newFilename;
+    }
+
+
+
+    @PostMapping("/signup")
+    public ResponseEntity<?> SignUp(
+            @RequestParam("username") String username,
+            @RequestParam("email") String email,
+            @RequestParam("password") String password,
+            @RequestParam("firstname") String firstname,
+            @RequestParam("lastname") String lastname,
+            @RequestParam("phoneNumber") String phoneNumber,
+            @RequestParam("address") String address,
+            @RequestParam("image") MultipartFile image // Add the image as MultipartFile
+    ) {
+        try {
+            // Check if the user already exists
+            if (userSer.findOneByEmail(email) != null || userSer.findOneByUsername(username) != null) {
+                JSONObject ExistResponse = new JSONObject();
+                ExistResponse.put("message", "Your e-mail or username is already used!");
+                ExistResponse.put("status", "error");
+                return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(ExistResponse.toString());
+            }
+
+            // Create a new user object
+            User u = new User();
+            u.setUsername(username);
+            u.setEmail(email);
+            u.setPassword(bCryptPasswordEncoder.encode(password));
+            u.setFirstname(firstname);
+            u.setLastname(lastname);
+            u.setPhoneNumber(Integer.valueOf(phoneNumber));
+            u.setAddress(address);
+            u.setStatus(User.Status.BLOCKED); // Default status
+            u.setRole(User.Role.USER);        // Default role
             u.setCreatedAt(LocalDateTime.now());
-            u.setPassword(bCryptPasswordEncoder.encode(u.getPassword()));
+            // After saving the user, process the image upload
+            if (image != null && !image.isEmpty()) {
+                u.setImageUrl(saveUserImage(image)); // Save image with user_id
+            }
             userSer.save(u);
             return ResponseEntity.accepted().build();
-        } catch(Exception e){
+
+        } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
     }
+
     
     @PostMapping("/login")
     public ResponseEntity<?> Login(@RequestBody LoginRequest l){
