@@ -1,6 +1,7 @@
 package com.backend.server.service;
 import org.springframework.beans.BeanUtils;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,21 @@ public class UserService {
         u.setStatus(User.Status.BLOCKED);
         return repo.save(u);
     }
+
+
+
+    public User findOrCreateUser(User u) {
+        User existingUser = repo.findOneByEmail(u.getEmail());
+        if (existingUser != null) {
+            return existingUser;
+        } else {
+            u.setCreatedAt(LocalDateTime.now());
+            u.setRole(User.Role.USER);
+            u.setStatus(User.Status.ACTIVE);
+            return repo.save(u);
+        }
+    }
+
     public User updateById(Long id,User upUser){
         User u = repo.findById(id).orElse(null);
         if (u == null) return null;
