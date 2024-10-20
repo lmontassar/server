@@ -1,7 +1,6 @@
 package com.backend.server.service;
 
 import com.backend.server.entity.Auction;
-import com.backend.server.entity.User;
 import com.backend.server.repository.AuctionRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,6 +25,11 @@ public class AuctionService {
     public Auction getAuction(Long id) {
         // Use Optional to handle the case where the auction might not be found
         return auctionRepo.findById(id).orElse(null);
+    }
+
+    public Auction updateAmount(Auction auction)
+    {
+        return auctionRepo.save(auction);
     }
 
     public Auction addAuction(Auction auction) {

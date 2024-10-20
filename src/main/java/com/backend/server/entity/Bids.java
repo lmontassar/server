@@ -34,4 +34,5 @@ public class Bids {
     private double amount;
 
     private LocalDateTime time;
+
 }

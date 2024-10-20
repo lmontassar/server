@@ -57,12 +57,12 @@ public class BidsController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<?> addBid(@RequestBody Bids b) {
+    public ResponseEntity<?> addBid(@RequestBody Bids bid) {
         try {
-            bidService.addBid(b);
+            Bids b = bidService.addBid(bid);
             return ResponseEntity.accepted().body(b);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.badRequest().body("Error: " + e.getMessage());
         }
     }
 
