@@ -117,7 +117,7 @@ public class UserController {
             u.setLastname(lastname);
             u.setPhoneNumber(Integer.valueOf(phoneNumber));
             u.setAddress(address);
-            u.setStatus(User.Status.BLOCKED); // Default status
+            u.setStatus(User.Status.ACTIVE); // Default status
             u.setRole(User.Role.USER);        // Default role
             u.setCreatedAt(LocalDateTime.now());
             // After saving the user, process the image upload
