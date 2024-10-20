@@ -1,10 +1,12 @@
 package com.backend.server.controller;
 
 import com.backend.server.entity.Auction;
+import com.backend.server.entity.User;
 import com.backend.server.service.AuctionService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity; // For ResponseEntity
+
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,8 +19,13 @@ public class AuctionController {
     private AuctionService auctionService;
 
     @GetMapping("/all")
-    public List<Auction> getAuctions() {
-        return auctionService.getAuctions();
+    public ResponseEntity<?> getAll(){
+        try{
+            List<Auction> auctions = auctionService.findAll() ;
+            return ResponseEntity.accepted().body(auctions);
+        }catch(Exception e){
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @PostMapping("/add")
