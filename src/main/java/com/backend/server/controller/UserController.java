@@ -151,6 +151,7 @@ public class UserController {
             return ResponseEntity.badRequest().build();
         }
     }
+
     @GetMapping("/google-login")
     public ResponseEntity<?> getUserInfo(@AuthenticationPrincipal OAuth2User principal) {
         if (principal != null) {
@@ -170,6 +171,7 @@ public class UserController {
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User is not authenticated.");
     }
+    
     @PutMapping("/update/{id}")
     public ResponseEntity<?> BlockOneById(@PathVariable("id") Long id,@RequestBody User u){
         try{

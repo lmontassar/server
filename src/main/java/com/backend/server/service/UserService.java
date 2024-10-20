@@ -11,7 +11,6 @@ import com.backend.server.repository.UserRepo;
 
 @Service
 public class UserService {
-
     @Autowired
     private UserRepo repo;
 
@@ -27,8 +26,6 @@ public class UserService {
         u.setStatus(User.Status.BLOCKED);
         return repo.save(u);
     }
-
-
 
     public User findOrCreateUser(User u) {
         User existingUser = repo.findOneByEmail(u.getEmail());
