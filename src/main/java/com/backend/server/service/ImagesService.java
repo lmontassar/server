@@ -7,19 +7,20 @@ import org.springframework.stereotype.Service;
 
 import com.backend.server.entity.Auction;
 import com.backend.server.entity.Images;
-import com.backend.server.repository.AuctionRepo;
 import com.backend.server.repository.ImagesRepo;
 
 @Service
 public class ImagesService {
     @Autowired
     private ImagesRepo imagesRepo;
-    @Autowired
-    private AuctionRepo auctionRepo;
 
     // Find all images
     public List<Images> findAll() {
         return imagesRepo.findAll();
+    }
+
+    public List<Images> findByAuction(Auction a){
+        return imagesRepo.findAllByAuction(a);
     }
 
     // Find an image by ID
@@ -48,10 +49,5 @@ public class ImagesService {
         Images image = imagesRepo.findById(id).orElse(null);
         if(image != null)
         imagesRepo.delete(image);
-    }
-
-    public Auction findAuctionById(Long auctionId) {
-    return auctionRepo.findById(auctionId)
-            .orElse(null);
     }
 }
