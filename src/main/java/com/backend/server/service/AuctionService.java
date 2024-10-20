@@ -1,6 +1,7 @@
 package com.backend.server.service;
 
 import com.backend.server.entity.Auction;
+import com.backend.server.entity.User;
 import com.backend.server.repository.AuctionRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -31,7 +32,9 @@ public class AuctionService {
         // If using Oracle, ensure your entity has proper ID generation strategy
         return auctionRepo.save(auction);
     }
-
+    public List<Auction> findAll(){
+        return auctionRepo.findAll();
+    }
     public void changeStatus(Long id, Auction.Status status) {
         // Fetch the auction first
         Optional<Auction> auctionOptional = auctionRepo.findById(id);
