@@ -35,7 +35,7 @@ public class BidsController {
  
 
     
-    @GetMapping("/bids")
+    @GetMapping("/all")
     public ResponseEntity<?> getAllBids(){
         try {
             List<Bids> l=bidService.getBids();
@@ -46,7 +46,7 @@ public class BidsController {
             
     }
 
-    @GetMapping("/bid/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<?> getBidById(@PathVariable("id") Long id) {
         try {
             Bids b=bidService.getBid(id);
@@ -56,9 +56,10 @@ public class BidsController {
         }
     }
 
-    @PostMapping("/bid/add")
+    @PostMapping("/add")
     public ResponseEntity<?> addBid(@RequestBody Bids b) {
         try {
+            bidService.addBid(b);
             return ResponseEntity.accepted().body(b);
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
@@ -92,7 +93,7 @@ public class BidsController {
     }
 
 
-    @DeleteMapping("/bid/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteBid(@PathVariable("id") Long id){
         try {
             Bids b=bidService.getBid(id);
