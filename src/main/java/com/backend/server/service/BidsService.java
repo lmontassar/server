@@ -1,5 +1,6 @@
 package com.backend.server.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +15,10 @@ import com.backend.server.repository.BidsRepo;
 public class BidsService {
     @Autowired
      private BidsRepo bidsRepo;
-
+    @Autowired
+    AuctionService aucSer;
+    @Autowired
+    UserService usrSer;
     public BidsService(BidsRepo bidsRepo) {
         this.bidsRepo = bidsRepo;
     }
@@ -28,9 +32,20 @@ public class BidsService {
         return bidsRepo.findById(id).orElse(null);
     }
 
-    public Bids addBid(Bids bid)
-    {
-        return bidsRepo.save(bid);
+    public Bids addBid(Bids bid) {
+        Auction auction = aucSer.getAuction(bid.getAuction().getId());
+        if (auction == null || auction.getStatus()== Auction.Status.CLOSED) {
+            throw new RuntimeException("Auction is not valid or has ended.");
+        }
+        User buyer = usrSer.findById(bid.getBuyer().getId());
+        Bids b = new Bids();
+        b.setBuyer(buyer);
+        b.setAuction(auction);
+        b.setAmount(bid.getAmount());
+        b.setTime(LocalDateTime.now());
+        auction.setCurrentPrice((float) bid.getAmount());
+        aucSer.updateAmount(auction);
+        return bidsRepo.save(b);
     }
 
     public List<Bids> getAllBidsByAuction(Auction a){
