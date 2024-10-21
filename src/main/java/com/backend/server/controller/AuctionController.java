@@ -27,6 +27,15 @@ public class AuctionController {
             return ResponseEntity.badRequest().build();
         }
     }
+    @GetMapping("/user/{id}")
+    public ResponseEntity<?> getAuctionsByUser(@PathVariable Long id){
+        try{
+            List<Auction> auctions = auctionService.getAuctionsByUser(id) ;
+            return ResponseEntity.accepted().body(auctions);
+        }catch(Exception e){
+            return ResponseEntity.badRequest().build();
+        }
+    }
 
     @PostMapping("/add")
     @ResponseStatus(HttpStatus.CREATED) // Set response status to 201
@@ -43,7 +52,6 @@ public class AuctionController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
-
 
     @PutMapping("/close/{id}")
     public void closeAuction(@PathVariable Long id) {

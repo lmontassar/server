@@ -50,4 +50,7 @@ public class AuctionService {
             throw new IllegalArgumentException("Auction with id " + id + " not found.");
         }
     }
+    public List<Auction> getAuctionsByUser(Long userid){
+        return auctionRepo.findAuctionsBySellerId(userid);
+    }
 }
