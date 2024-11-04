@@ -23,7 +23,7 @@ import com.backend.server.service.UserService;
 
 
 @RestController
-@RequestMapping(path="/bid")
+@RequestMapping(path="/bids")
 public class BidsController {
     @Autowired
     BidsService bidService;
@@ -66,7 +66,7 @@ public class BidsController {
         }
     }
 
-    @GetMapping("/bidsByAuction/{id}")
+    @GetMapping("/auction/{id}")
     public ResponseEntity<?> getBidsByAuction(@PathVariable("id") Long id) {
         try {
             
@@ -79,7 +79,7 @@ public class BidsController {
         }
     }
 
-    @GetMapping("/bidsByUser/{id}")
+    @GetMapping("/user/{id}")
     public ResponseEntity<?> getBidsByUser(@PathVariable("id") Long id) {
         try {
             

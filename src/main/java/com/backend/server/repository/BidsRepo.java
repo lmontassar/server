@@ -10,6 +10,6 @@ import com.backend.server.entity.Bids;
 import com.backend.server.entity.User;
 @Repository
 public interface BidsRepo extends JpaRepository<Bids,Long> {
-public List<Bids> findByAuction(Auction auction); 
-public List<Bids> findByBuyer(User u);
+    public List<Bids> findByAuction(Auction auction);
+    public List<Bids> findByBuyer(User u);
 }
