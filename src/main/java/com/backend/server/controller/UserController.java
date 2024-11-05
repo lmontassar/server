@@ -142,7 +142,7 @@ public class UserController {
             else return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
             if( bCryptPasswordEncoder.matches(l.getPassword(), u.getPassword()) ){
                 String jwt = myJwt.generateToken(u);
-                LoginResponse Lr = new LoginResponse(jwt);
+                LoginResponse Lr = new LoginResponse(jwt,u);
                 return ResponseEntity.status(HttpStatus.ACCEPTED).body(Lr);
             } else {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -166,7 +166,7 @@ public class UserController {
             User user = userSer.findOrCreateUser(userInfo);
 
             String jwtToken = myJwt.generateToken(user);
-            LoginResponse Lr = new LoginResponse(jwtToken);
+            LoginResponse Lr = new LoginResponse(jwtToken,user);
             return ResponseEntity.status(HttpStatus.ACCEPTED).body(Lr);
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User is not authenticated.");
