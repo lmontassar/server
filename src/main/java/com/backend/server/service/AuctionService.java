@@ -3,8 +3,12 @@ package com.backend.server.service;
 import com.backend.server.entity.Auction;
 import com.backend.server.repository.AuctionRepo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,7 +21,19 @@ public class AuctionService {
     public AuctionService(AuctionRepo auctionRepo) {
         this.auctionRepo = auctionRepo;
     }
+    @Scheduled(fixedRate = 60000) // Check every minute
+    public void closeExpiredAuctions() {
+        LocalDateTime nowLocalDateTime = LocalDateTime.now();
+        // Convert LocalDateTime to Date
+        Date nowDate = Date.from(nowLocalDateTime.atZone(ZoneId.systemDefault()).toInstant());
 
+        List<Auction> auctionsToClose = auctionRepo.findByEndTimeBeforeAndStatus(nowDate, Auction.Status.OPEN);
+
+        for (Auction auction : auctionsToClose) {
+            auction.setStatus(Auction.Status.CLOSED);
+            auctionRepo.save(auction);
+        }
+    }
     public List<Auction> getAuctions() {
         return auctionRepo.findAll();
     }
