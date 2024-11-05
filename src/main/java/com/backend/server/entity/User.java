@@ -35,7 +35,7 @@ public class User {
 
     private String firstname;
     private String lastname;
-
+    private float amount = 0;
     private Integer phoneNumber; // Change from number to phoneNumber
 
     private String address;
