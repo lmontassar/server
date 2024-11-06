@@ -37,22 +37,34 @@ public class BidsService {
         return bidsRepo.findById(id).orElse(null);
     }
 
-    public Bids addBid(Bids bid) {
+    public Bids addBid(Bids bid ) throws RuntimeException {
         Auction auction = aucSer.getAuction(bid.getAuction().getId());
         if (auction == null || auction.getStatus()== Auction.Status.CLOSED) {
             throw new RuntimeException("Auction is not valid or has ended.");
         }
         User buyer = usrSer.findById(bid.getBuyer().getId());
         if (bid.getAmount() > buyer.getAmount()) {
-            throw new RuntimeException("Your amount is low !");
+            throw new RuntimeException("Your credit is low !");
         }
         buyer.setAmount((float) (buyer.getAmount() - bid.getAmount()));
-        //Return user amount
-        Bids lastBid = bidsRepo.findTopByAuctionOrderByAmountDesc(auction);
-        User lastBuyer = usrSer.findById(lastBid.getBuyer().getId());
-        lastBuyer.setAmount((float) (lastBuyer.getAmount()+lastBid.getAmount()));
-        usrRepo.save(lastBuyer);
-        //
+        List<Bids> bidsList = bidsRepo.findByAuction(auction);
+
+        if(!bidsList.isEmpty()){
+            //Return user amount
+
+            Bids lastBid = bidsRepo.findByAuctionOrderByAmountDesc(auction.getId());
+            if(lastBid.getAmount() > bid.getAmount()){
+                throw new RuntimeException("the amount is lower then the minimum");
+            }
+            if(lastBid.getBuyer().getId().equals(buyer.getId()) ){
+                throw new RuntimeException("You can't add a bid !");
+            }
+            User lastBuyer = usrSer.findById(lastBid.getBuyer().getId());
+            lastBuyer.setAmount((float) (lastBuyer.getAmount()+lastBid.getAmount()));
+            usrRepo.save(lastBuyer);
+            //
+        }
+        //send notification to the last buyer
         Bids b = new Bids();
         b.setBuyer(buyer);
         b.setAuction(auction);
