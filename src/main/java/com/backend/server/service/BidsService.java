@@ -38,6 +38,9 @@ public class BidsService {
             throw new RuntimeException("Auction is not valid or has ended.");
         }
         User buyer = usrSer.findById(bid.getBuyer().getId());
+        if (bid.getAmount() > buyer.getAmount()) {
+            throw new RuntimeException("Your amount is low !");
+        }
         Bids b = new Bids();
         b.setBuyer(buyer);
         b.setAuction(auction);
