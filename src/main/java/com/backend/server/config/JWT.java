@@ -49,4 +49,19 @@ public class JWT {
                     .compact();
         return r;
     }
+    public String payloadJWTExtraction(String token, String key) {
+        try {
+            Claims claims = Jwts.parser()
+                            .setSigningKey(getKey())
+                            .build()
+                            .parseClaimsJws(token)
+                            .getBody();
+            return claims.get(key, String.class);// Extract the value associated with the specified key
+        } catch (SignatureException e) {
+            throw new RuntimeException("Invalid JWT signature");
+        } catch (Exception e) {
+            throw new RuntimeException("Could not parse JWT token");
+        }
+    }
+
 }

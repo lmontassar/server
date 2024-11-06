@@ -7,8 +7,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.backend.server.entity.Auction;
 import com.backend.server.entity.Transaction;
 import com.backend.server.service.TransactionService;
 import org.springframework.web.bind.annotation.GetMapping;

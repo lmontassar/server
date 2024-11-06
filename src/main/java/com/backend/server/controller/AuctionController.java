@@ -1,7 +1,6 @@
 package com.backend.server.controller;
 
 import com.backend.server.entity.Auction;
-import com.backend.server.entity.User;
 import com.backend.server.service.AuctionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity; // For ResponseEntity

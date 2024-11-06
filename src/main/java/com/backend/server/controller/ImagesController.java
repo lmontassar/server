@@ -29,9 +29,7 @@ import com.backend.server.service.ImagesService;
 
 import io.jsonwebtoken.io.IOException;
 
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 @RestController
 @RequestMapping(path="/images")
