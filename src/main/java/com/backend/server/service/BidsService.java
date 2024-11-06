@@ -3,6 +3,7 @@ package com.backend.server.service;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.backend.server.repository.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +20,10 @@ public class BidsService {
     AuctionService aucSer;
     @Autowired
     UserService usrSer;
+
+    @Autowired
+    UserRepo usrRepo;
+
     public BidsService(BidsRepo bidsRepo) {
         this.bidsRepo = bidsRepo;
     }
@@ -41,6 +46,13 @@ public class BidsService {
         if (bid.getAmount() > buyer.getAmount()) {
             throw new RuntimeException("Your amount is low !");
         }
+        buyer.setAmount((float) (buyer.getAmount() - bid.getAmount()));
+        //Return user amount
+        Bids lastBid = bidsRepo.findTopByAuctionOrderByAmountDesc(auction);
+        User lastBuyer = usrSer.findById(lastBid.getBuyer().getId());
+        lastBuyer.setAmount((float) (lastBuyer.getAmount()+lastBid.getAmount()));
+        usrRepo.save(lastBuyer);
+        //
         Bids b = new Bids();
         b.setBuyer(buyer);
         b.setAuction(auction);
