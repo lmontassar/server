@@ -20,6 +20,7 @@ import com.backend.server.entity.Bids;
 import com.backend.server.entity.User;
 import com.backend.server.service.AuctionService;
 import com.backend.server.service.BidsService;
+import com.backend.server.service.EmailService;
 import com.backend.server.service.UserService;
 
 
@@ -33,10 +34,9 @@ public class BidsController {
     AuctionService aucSer;
     @Autowired
     UserService usrSer;
+    @Autowired
+    EmailService emailService;
 
- 
-
-    
     @GetMapping("/all")
     public ResponseEntity<?> getAllBids(){
         try {
@@ -52,6 +52,7 @@ public class BidsController {
     public ResponseEntity<?> getBidById(@PathVariable("id") Long id) {
         try {
             Bids b=bidService.getBid(id);
+            
             return ResponseEntity.accepted().body(b);
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
@@ -62,6 +63,8 @@ public class BidsController {
     public ResponseEntity<?> addBid(@RequestBody Bids bid) {
         try {
             Bids b = bidService.addBid(bid);
+            emailService.sendEmail(bid.getAuction().getSeller().getEmail(), "Hey there, you have a new bid", "You have received a new bid in Auction ID: " + bid.getAuction().getId());
+
             return ResponseEntity.accepted().body(b);
         } catch (Exception e) {
             Map<String, String> errorResponse = new HashMap<>();

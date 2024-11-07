@@ -1,7 +1,14 @@
 package com.backend.server.service;
 
 import com.backend.server.entity.Auction;
+import com.backend.server.entity.Bids;
+import com.backend.server.entity.Transaction;
+import com.backend.server.entity.User;
+import com.backend.server.entity.Transaction.Status;
 import com.backend.server.repository.AuctionRepo;
+import com.backend.server.repository.BidsRepo;
+import com.backend.server.repository.TransactionRepo;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -14,13 +21,15 @@ import java.util.Optional;
 
 @Service
 public class AuctionService {
-
-    private final AuctionRepo auctionRepo;
-
     @Autowired
-    public AuctionService(AuctionRepo auctionRepo) {
-        this.auctionRepo = auctionRepo;
-    }
+    private AuctionRepo auctionRepo;
+    @Autowired
+    private BidsRepo bidsRepo;
+    @Autowired
+    private TransactionRepo transRepo;
+    @Autowired
+    private EmailService emailService;
+   
     @Scheduled(fixedRate = 60000) // Check every minute
     public void closeExpiredAuctions() {
         LocalDateTime nowLocalDateTime = LocalDateTime.now();
@@ -29,9 +38,24 @@ public class AuctionService {
 
         List<Auction> auctionsToClose = auctionRepo.findByEndTimeBeforeAndStatus(nowDate, Auction.Status.OPEN);
 
-        for (Auction auction : auctionsToClose) {
-            auction.setStatus(Auction.Status.CLOSED);
+        for ( Auction auction : auctionsToClose ) {
+            auction.setStatus(Auction.Status.CLOSED); // closed the auction
             auctionRepo.save(auction);
+
+            // send mail to seller
+            emailService.sendEmail(auction.getSeller().getEmail(), "The auction has ended", "Your auction has ended.<br>Auction ID: " + auction.getId());
+
+            Bids b = bidsRepo.findByAuctionOrderByAmountDesc(auction.getId());
+            User buyer = b.getBuyer();
+            Transaction transaction = new Transaction();
+            transaction.setBuyer(buyer);
+            transaction.setAuction(auction);
+            transaction.setSeller(auction.getSeller());
+            transaction.setStatus(Status.INPROGRESS);
+            transaction.setTransaction_date(new Date());
+            transaction.setAmount(b.getAmount());
+            transRepo.save(transaction);
+            emailService.sendEmail(buyer.getEmail(), "You won the auction", "The auction has ended, and you are the winner.<br>Auction ID: " + auction.getId());
         }
     }
     public List<Auction> getAuctions() {

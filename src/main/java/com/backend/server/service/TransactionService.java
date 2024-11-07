@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.backend.server.entity.Transaction;
+import com.backend.server.entity.User;
 import com.backend.server.repository.TransactionRepo;
 
 @Service
@@ -18,6 +19,13 @@ public class TransactionService {
         this.tranRepo = tranRepo;
     }
 
+    public List<Transaction> getTransactionByBuyer(User u) {
+        return tranRepo.findByBuyer(u);
+    }
+
+    public List<Transaction> getTransactionBySeller(User u) {
+        return tranRepo.findBySeller(u);
+    }
 
     public List<Transaction> getTransactions(){
         return tranRepo.findAll();

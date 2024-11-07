@@ -51,7 +51,7 @@ public class BidsService {
 
         if(!bidsList.isEmpty()){
             //Return user amount
-
+            
             Bids lastBid = bidsRepo.findByAuctionOrderByAmountDesc(auction.getId());
             if(lastBid.getAmount() > bid.getAmount()){
                 throw new RuntimeException("the amount is lower then the minimum");

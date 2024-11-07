@@ -14,22 +14,35 @@ import org.springframework.core.io.Resource; // For Resource type
 import org.springframework.core.io.UrlResource; // For UrlResource
 import org.springframework.http.HttpHeaders; // For HTTP headers
 import org.springframework.http.ResponseEntity; // For ResponseEntity
-import org.springframework.web.bind.annotation.GetMapping; // For handling GET requests
-import org.springframework.web.bind.annotation.PathVariable; // For accessing path variables
-import org.springframework.web.bind.annotation.RestController; // For marking the class as a REST controller
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.util.StringUtils;
+// For handling GET requests
+// For accessing path variables
+// For marking the class as a REST controller
 import org.springframework.web.bind.annotation.*;
 import com.backend.server.config.JWT;
 import com.backend.server.entity.LoginRequest;
 import com.backend.server.entity.LoginResponse;
 import com.backend.server.entity.User;
+import com.backend.server.service.EmailService;
 import com.backend.server.service.UserService;
+
+import lombok.Data;
+
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.multipart.MultipartFile;
+
+@Data
+class EmailRequest {
+    private String to;
+    private String subject;
+    private String body;
+
+    // Getters and setters
+}
 
 @RestController
 @RequestMapping(path="/user")
@@ -43,6 +56,15 @@ public class UserController {
     @Autowired 
     private BCryptPasswordEncoder bCryptPasswordEncoder;
 
+    @Autowired
+    private EmailService emailService;
+
+    @PostMapping("/send-email")
+    public String sendEmail(@RequestBody EmailRequest request) {
+        emailService.sendEmail(request.getTo(), request.getSubject(), request.getBody());
+        return "Email sent successfully";
+    }
+    
     @GetMapping("/get/{id}")
     public ResponseEntity<?> getOneById(@PathVariable ("id")Long id){
         try{

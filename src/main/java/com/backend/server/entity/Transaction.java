@@ -38,7 +38,7 @@ public class Transaction {
     private User seller;
 
     @ManyToOne
-    @JoinColumn(name = "transportor", nullable = false)
+    @JoinColumn(name = "transportor")
     private User transportor;
 
     private Date transaction_date;
@@ -50,6 +50,9 @@ public class Transaction {
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     private Status status;
+
+    @Column(name = "amount", nullable = false)
+    private double amount;
 
     private String delivery_adress;
     private Status delivery_status;
