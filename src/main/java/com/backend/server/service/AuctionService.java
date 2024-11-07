@@ -29,6 +29,8 @@ public class AuctionService {
     private TransactionRepo transRepo;
     @Autowired
     private EmailService emailService;
+    @Autowired
+    private UserService userservice;
    
     @Scheduled(fixedRate = 60000) // Check every minute
     public void closeExpiredAuctions() {
@@ -44,18 +46,22 @@ public class AuctionService {
 
             // send mail to seller
            try{
-               emailService.sendEmail(auction.getSeller().getEmail(), "The auction has ended", "Your auction has ended.<br>Auction ID: " + auction.getId());
+               //emailService.sendEmail(auction.getSeller().getEmail(), "The auction has ended", "Your auction has ended.<br>Auction ID: " + auction.getId());
                Bids b = bidsRepo.findByAuctionOrderByAmountDesc(auction.getId());
                User buyer = b.getBuyer();
+               User seller = auction.getSeller();
+               seller.setAmount((float)(seller.getAmount()+b.getAmount()));
                Transaction transaction = new Transaction();
                transaction.setBuyer(buyer);
                transaction.setAuction(auction);
+
                transaction.setSeller(auction.getSeller());
                transaction.setStatus(Status.INPROGRESS);
                transaction.setTransaction_date(new Date());
                transaction.setAmount(b.getAmount());
                transRepo.save(transaction);
-               emailService.sendEmail(buyer.getEmail(), "You won the auction", "The auction has ended, and you are the winner.<br>Auction ID: " + auction.getId());
+               userservice.save(seller);
+               //emailService.sendEmail(buyer.getEmail(), "You won the auction", "The auction has ended, and you are the winner.<br>Auction ID: " + auction.getId());
            }catch (Exception e){
                System.out.println(e.getMessage());
            }
