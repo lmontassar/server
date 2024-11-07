@@ -43,19 +43,22 @@ public class AuctionService {
             auctionRepo.save(auction);
 
             // send mail to seller
-            emailService.sendEmail(auction.getSeller().getEmail(), "The auction has ended", "Your auction has ended.<br>Auction ID: " + auction.getId());
-
-            Bids b = bidsRepo.findByAuctionOrderByAmountDesc(auction.getId());
-            User buyer = b.getBuyer();
-            Transaction transaction = new Transaction();
-            transaction.setBuyer(buyer);
-            transaction.setAuction(auction);
-            transaction.setSeller(auction.getSeller());
-            transaction.setStatus(Status.INPROGRESS);
-            transaction.setTransaction_date(new Date());
-            transaction.setAmount(b.getAmount());
-            transRepo.save(transaction);
-            emailService.sendEmail(buyer.getEmail(), "You won the auction", "The auction has ended, and you are the winner.<br>Auction ID: " + auction.getId());
+           try{
+               emailService.sendEmail(auction.getSeller().getEmail(), "The auction has ended", "Your auction has ended.<br>Auction ID: " + auction.getId());
+               Bids b = bidsRepo.findByAuctionOrderByAmountDesc(auction.getId());
+               User buyer = b.getBuyer();
+               Transaction transaction = new Transaction();
+               transaction.setBuyer(buyer);
+               transaction.setAuction(auction);
+               transaction.setSeller(auction.getSeller());
+               transaction.setStatus(Status.INPROGRESS);
+               transaction.setTransaction_date(new Date());
+               transaction.setAmount(b.getAmount());
+               transRepo.save(transaction);
+               emailService.sendEmail(buyer.getEmail(), "You won the auction", "The auction has ended, and you are the winner.<br>Auction ID: " + auction.getId());
+           }catch (Exception e){
+               System.out.println(e.getMessage());
+           }
         }
     }
     public List<Auction> getAuctions() {
