@@ -65,7 +65,16 @@ public class BidsController {
         try {
             Bids b = bidService.addBid(bid);
             Auction auction = auctionService.getAuction((b.getAuction()).getId());
-            emailService.sendEmail( (auction.getSeller()).getEmail(), "Hey there, you have a new bid", "You have received a new bid in Auction ID: " + bid.getAuction().getId());
+            emailService.sendEmail(
+                auction.getSeller().getEmail(),
+                "New Bid Received on Your Auction",
+                "<p>Dear " + auction.getSeller().getFirstname() + ",</p>"
+                + "<p>We are pleased to inform you that a new bid has been placed on your auction!</p>"
+                + "<p><strong>Auction ID:</strong> " + bid.getAuction().getId() + "</p>"
+                + "<p>Visit your account to view the latest bid details and stay updated on the progress of your auction.</p>"
+                + "<p>Thank you for using our platform, and best of luck with your auction!</p>"
+                + "<p>Warm regards,<br/>The S&D Team</p>"
+            );
             return ResponseEntity.accepted().body(b);
         } catch (Exception e) {
             Map<String, String> errorResponse = new HashMap<>();
