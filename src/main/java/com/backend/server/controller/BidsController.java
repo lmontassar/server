@@ -64,7 +64,6 @@ public class BidsController {
         try {
             Bids b = bidService.addBid(bid);
             emailService.sendEmail(bid.getAuction().getSeller().getEmail(), "Hey there, you have a new bid", "You have received a new bid in Auction ID: " + bid.getAuction().getId());
-
             return ResponseEntity.accepted().body(b);
         } catch (Exception e) {
             Map<String, String> errorResponse = new HashMap<>();

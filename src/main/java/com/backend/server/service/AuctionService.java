@@ -46,7 +46,7 @@ public class AuctionService {
 
             // send mail to seller
            try{
-               //emailService.sendEmail(auction.getSeller().getEmail(), "The auction has ended", "Your auction has ended.<br>Auction ID: " + auction.getId());
+               emailService.sendEmail(auction.getSeller().getEmail(), "The auction has ended", "Your auction has ended.<br>Auction ID: " + auction.getId());
                Bids b = bidsRepo.findByAuctionOrderByAmountDesc(auction.getId());
                User buyer = b.getBuyer();
                User seller = auction.getSeller();
@@ -61,7 +61,7 @@ public class AuctionService {
                transaction.setAmount(b.getAmount());
                transRepo.save(transaction);
                userservice.save(seller);
-               //emailService.sendEmail(buyer.getEmail(), "You won the auction", "The auction has ended, and you are the winner.<br>Auction ID: " + auction.getId());
+               emailService.sendEmail(buyer.getEmail(), "You won the auction", "The auction has ended, and you are the winner.<br>Auction ID: " + auction.getId());
            }catch (Exception e){
                System.out.println(e.getMessage());
            }
