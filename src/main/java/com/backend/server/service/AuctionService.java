@@ -32,7 +32,7 @@ public class AuctionService {
     @Autowired
     private UserService userservice;
    
-    @Scheduled(fixedRate = 60000) // Check every minute
+    @Scheduled(fixedRate = 5000) // Check every minute
     public void closeExpiredAuctions() {
         LocalDateTime nowLocalDateTime = LocalDateTime.now();
         // Convert LocalDateTime to Date
