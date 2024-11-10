@@ -9,6 +9,8 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
+
+import jakarta.mail.MessagingException;
 import org.json.JSONObject;
 import org.springframework.core.io.Resource; // For Resource type
 import org.springframework.core.io.UrlResource; // For UrlResource
@@ -61,8 +63,12 @@ public class UserController {
 
     @PostMapping("/send-email")
     public String sendEmail(@RequestBody EmailRequest request) {
-        emailService.sendEmail(request.getTo(), request.getSubject(), request.getBody());
-        return "Email sent successfully";
+        try {
+            emailService.sendEmail(request.getTo(), request.getSubject(), request.getBody());
+            return "Email sent successfully";
+        } catch (MessagingException e) {
+            return "Failed to send email: " + e.getMessage();
+        }
     }
     
     @GetMapping("/get/{id}")

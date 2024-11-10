@@ -32,7 +32,7 @@ public class AuctionService {
     @Autowired
     private UserService userservice;
    
-    @Scheduled(fixedRate = 60000) // Check every minute
+    @Scheduled(fixedRate = 5000) // Check every minute
     public void closeExpiredAuctions() {
         LocalDateTime nowLocalDateTime = LocalDateTime.now();
         // Convert LocalDateTime to Date
@@ -46,7 +46,15 @@ public class AuctionService {
 
             // send mail to seller
            try{
-               emailService.sendEmail(auction.getSeller().getEmail(), "The auction has ended", "Your auction has ended.<br>Auction ID: " + auction.getId());
+               emailService.sendEmail(
+                       auction.getSeller().getEmail(),
+                       "Auction Ended Notification",
+                       "<p>Dear " + auction.getSeller().getFirstname() + ",</p>"
+                               + "<p>We would like to inform you that your auction has ended.</p>"
+                               + "<p><strong>Auction ID:</strong> " + auction.getId() + "</p>"
+                               + "<p>Thank you for using our platform. Please feel free to check your account for the final bid details or any further actions.</p>"
+                               + "<p>Best regards,<br/>S&D Team</p>"
+               );
                Bids b = bidsRepo.findByAuctionOrderByAmountDesc(auction.getId());
                User buyer = b.getBuyer();
                User seller = auction.getSeller();
@@ -61,7 +69,16 @@ public class AuctionService {
                transaction.setAmount(b.getAmount());
                transRepo.save(transaction);
                userservice.save(seller);
-               emailService.sendEmail(buyer.getEmail(), "You won the auction", "The auction has ended, and you are the winner.<br>Auction ID: " + auction.getId());
+               emailService.sendEmail(
+                       buyer.getEmail(),
+                       "Congratulations! You've Won the Auction",
+                       "<p>Dear " + buyer.getFirstname() + ",</p>"
+                               + "<p>We’re excited to inform you that the auction has ended, and you are the winning bidder!</p>"
+                               + "<p><strong>Auction ID:</strong> " + auction.getId() + "</p>"
+                               + "<p>Please log in to your account to review the auction details and complete any remaining steps for the transaction.</p>"
+                               + "<p>Thank you for participating, and congratulations on your win!</p>"
+                               + "<p>Best regards,<br/>S&D Team</p>"
+               );
            }catch (Exception e){
                System.out.println(e.getMessage());
            }
