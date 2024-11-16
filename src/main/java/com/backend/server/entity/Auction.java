@@ -27,8 +27,10 @@ public class Auction {
 
     @Column(name = "description", nullable = false)
     private String description;
+
     @Column(name = "participation_price", nullable = false)
-    private String participationPrice;
+    private float participationPrice;
+
     @Column(name = "start_price", nullable = false)
     private float startPrice;
 

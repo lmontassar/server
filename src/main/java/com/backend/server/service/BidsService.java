@@ -46,8 +46,14 @@ public class BidsService {
         if (bid.getAmount() > buyer.getAmount()) {
             throw new RuntimeException("Your credit is low !");
         }
-        buyer.setAmount((float) (buyer.getAmount() - bid.getAmount()));
         List<Bids> bidsList = bidsRepo.findByAuction(auction);
+        // Check if the buyer is already in the bidsList
+        boolean buyerExists = bidsList.stream()
+                .anyMatch(bidd -> bidd.getBuyer().equals(buyer));
+        if (!buyerExists) {
+            buyer.setAmount((float) (buyer.getAmount() - auction.getParticipationPrice()));
+        }
+
 
         if(!bidsList.isEmpty()){
             //Return user amount
@@ -59,9 +65,6 @@ public class BidsService {
             if(lastBid.getBuyer().getId().equals(buyer.getId()) ){
                 throw new RuntimeException("You can't add a bid !");
             }
-            User lastBuyer = usrSer.findById(lastBid.getBuyer().getId());
-            lastBuyer.setAmount((float) (lastBuyer.getAmount()+lastBid.getAmount()));
-            usrRepo.save(lastBuyer);
             //
         }
         //send notification to the last buyer
