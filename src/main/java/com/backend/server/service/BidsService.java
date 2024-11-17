@@ -53,12 +53,8 @@ public class BidsService {
         if (!buyerExists) {
             buyer.setAmount((float) (buyer.getAmount() - auction.getParticipationPrice()));
         }
-
-
         if(!bidsList.isEmpty()){
-            //Return user amount
-            
-            Bids lastBid = bidsRepo.findByAuctionOrderByAmountDesc(auction.getId());
+            Bids lastBid = bidsRepo.findOneByAuctionOrderByAmountDesc(auction.getId());
             if(lastBid.getAmount() > bid.getAmount()){
                 throw new RuntimeException("the amount is lower then the minimum");
             }

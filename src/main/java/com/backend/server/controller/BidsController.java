@@ -120,9 +120,5 @@ public class BidsController {
             return ResponseEntity.badRequest().build();
         }
     }
-    
-    
-    
-
 
 }

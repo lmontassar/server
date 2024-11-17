@@ -46,39 +46,84 @@ public class AuctionService {
 
             // send mail to seller
            try{
-               emailService.sendEmail(
-                       auction.getSeller().getEmail(),
-                       "Auction Ended Notification",
-                       "<p>Dear " + auction.getSeller().getFirstname() + ",</p>"
-                               + "<p>We would like to inform you that your auction has ended.</p>"
-                               + "<p><strong>Auction ID:</strong> " + auction.getId() + "</p>"
-                               + "<p>Thank you for using our platform. Please feel free to check your account for the final bid details or any further actions.</p>"
-                               + "<p>Best regards,<br/>S&D Team</p>"
-               );
-               Bids b = bidsRepo.findByAuctionOrderByAmountDesc(auction.getId());
-               User buyer = b.getBuyer();
-               User seller = auction.getSeller();
-               seller.setAmount((float)(seller.getAmount()+b.getAmount()));
-               Transaction transaction = new Transaction();
-               transaction.setBuyer(buyer);
-               transaction.setAuction(auction);
 
-               transaction.setSeller(auction.getSeller());
-               transaction.setStatus(Status.INPROGRESS);
-               transaction.setTransaction_date(new Date());
-               transaction.setAmount(b.getAmount());
-               transRepo.save(transaction);
-               userservice.save(seller);
-               emailService.sendEmail(
-                       buyer.getEmail(),
-                       "Congratulations! You've Won the Auction",
-                       "<p>Dear " + buyer.getFirstname() + ",</p>"
-                               + "<p>We’re excited to inform you that the auction has ended, and you are the winning bidder!</p>"
-                               + "<p><strong>Auction ID:</strong> " + auction.getId() + "</p>"
-                               + "<p>Please log in to your account to review the auction details and complete any remaining steps for the transaction.</p>"
-                               + "<p>Thank you for participating, and congratulations on your win!</p>"
-                               + "<p>Best regards,<br/>S&D Team</p>"
-               );
+               List<Bids> bidsList = bidsRepo.findByAuctionOrderByAmountDesc(auction.getId());
+               int Bought = 0;
+               for (Bids b:bidsList) {
+                   User buyer = b.getBuyer();
+                   if(Bought == 1){
+                       buyer.setAmount(buyer.getAmount()+auction.getParticipationPrice());
+                       emailService.sendEmail(
+                               buyer.getEmail(),
+                               "Bid Lost",
+                               "<p>Dear " + buyer.getFirstname() + ",</p>"
+                                       + "<p>We would like to inform you that you lost the bid : </p>"
+                                       + "<p><strong>Auction Title:</strong> " + auction.getTitle() + "</p>"
+                                       + "<p>You will receive the participation amount ASAP .</p>"
+                                       + "<p>Thank you for using our platform. Please feel free to check your account for the final bid details or any further actions.</p>"
+                                       + "<p>Best regards,<br/>S&D Team</p>"
+                       );
+                   }
+                   if(b.getAmount()>buyer.getAmount() && Bought == 0){
+                       emailService.sendEmail(
+                               buyer.getEmail(),
+                               "Bid Lost",
+                               "<p>Dear " + buyer.getFirstname() + ",</p>"
+                                       + "<p>We would like to inform you that you lost the bid : </p>"
+                                       + "<p><strong>Auction Title:</strong> " + auction.getTitle() + "</p>"
+                                       + "<p>You will not receive the participation amount because you don't have the needed amount to pay , i Hope you understand </p>"
+                                       + "<p>Thank you for using our platform. Please feel free to check your account for the final bid details or any further actions.</p>"
+                                       + "<p>Best regards,<br/>S&D Team</p>"
+                       );
+                   }else{
+                       User seller = auction.getSeller();
+                       buyer.setAmount(buyer.getAmount()+auction.getParticipationPrice());
+                       buyer.setAmount((float) (buyer.getAmount()-b.getAmount()));
+                       seller.setAmount((float)(seller.getAmount()+b.getAmount()));
+                       Transaction transaction = new Transaction();
+                       transaction.setBuyer(buyer);
+                       transaction.setAuction(auction);
+                       transaction.setSeller(auction.getSeller());
+                       transaction.setStatus(Status.INPROGRESS);
+                       transaction.setTransaction_date(new Date());
+                       transaction.setAmount(b.getAmount());
+                       transRepo.save(transaction);
+                       userservice.save(seller);
+                       emailService.sendEmail(
+                               buyer.getEmail(),
+                               "Congratulations! You've Won the Auction",
+                               "<p>Dear " + buyer.getFirstname() + ",</p>"
+                                       + "<p>We’re excited to inform you that the auction has ended, and you are the winning bidder!</p>"
+                                       + "<p><strong>Auction ID:</strong> " + auction.getId() + "</p>"
+                                       + "<p>Please log in to your account to review the auction details and complete any remaining steps for the transaction.</p>"
+                                       + "<p>Thank you for participating, and congratulations on your win!</p>"
+                                       + "<p>Best regards,<br/>S&D Team</p>"
+                       );
+                       emailService.sendEmail(
+                               auction.getSeller().getEmail(),
+                               "Auction Ended Notification",
+                               "<p>Dear " + auction.getSeller().getFirstname() + ",</p>"
+                                       + "<p>We would like to inform you that your auction has ended, bought by "+buyer.getFirstname()+" "+buyer.getLastname()+".</p>"
+                                       + "<p><strong>Auction ID:</strong> " + auction.getId() + "</p>"
+                                       + "<p>Thank you for using our platform. Please feel free to check your account for the final bid details or any further actions.</p>"
+                                       + "<p>Best regards,<br/>S&D Team</p>"
+                       );
+                       Bought = 1;
+                   }
+               }
+               if(Bought == 0){
+                   emailService.sendEmail(
+                           auction.getSeller().getEmail(),
+                           "Auction Canceled",
+                           "<p>Dear " + auction.getSeller().getFirstname() + ",</p>"
+                                   + "<p>Sorry to inform you that your auction has been canceled due to no one bought it before the end time : </p>"
+                                   + "<p><strong>Auction ID:</strong> " + auction.getId() + "</p>"
+                                   + "<p><strong>Auction Title:</strong> " + auction.getTitle() + "</p>"
+                                   + "<p>You can created the auction again or you can extend the time of the auction.</p>"
+                                   + "<p>Thank you for using our platform. Please feel free to check your account for the final bid details or any further actions.</p>"
+                                   + "<p>Best regards,<br/>S&D Team</p>"
+                   );
+               }
            }catch (Exception e){
                System.out.println(e.getMessage());
            }

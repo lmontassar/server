@@ -15,5 +15,8 @@ public interface BidsRepo extends JpaRepository<Bids,Long> {
     public List<Bids> findByAuction(Auction auction);
     public List<Bids> findByBuyer(User u);
     @Query(value = "SELECT * FROM (SELECT * FROM bids WHERE auction_id = :auction_id ORDER BY amount DESC) WHERE ROWNUM = 1",nativeQuery = true)
-    public Bids findByAuctionOrderByAmountDesc(@Param("auction_id")Long auction_id);
+    public Bids findOneByAuctionOrderByAmountDesc(@Param("auction_id")Long auction_id);
+
+    @Query(value = "SELECT * FROM bids WHERE auction_id = :auction_id Order By amount DESC",nativeQuery = true)
+    public List<Bids> findByAuctionOrderByAmountDesc(@Param("auction_id")Long auction_id);
 }
