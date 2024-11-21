@@ -56,6 +56,4 @@ public class Transaction {
     private double amount;
 
     private String delivery_adress;
-    private Status delivery_status;
-
 }
