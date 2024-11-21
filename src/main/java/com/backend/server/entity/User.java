@@ -19,7 +19,7 @@ public class User {
     private Long id;
 
     public enum Role {
-        ADMIN, USER
+        ADMIN, USER, TRANSPORTER
     }
 
     public enum Status {
