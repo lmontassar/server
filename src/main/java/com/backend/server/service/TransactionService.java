@@ -39,7 +39,7 @@ public class TransactionService {
         return tranRepo.save(transaction);
     }
 
-        public void changeStatus(Long id, Transaction.Status status) {
+    public void changeStatus(Long id, Transaction.Status status) {
         // Fetch the auction first
         Optional<Transaction> transactionOptional = tranRepo.findById(id);
         if (transactionOptional.isPresent()) {
@@ -48,11 +48,20 @@ public class TransactionService {
             tranRepo.save(transaction); // Save the updated auction
         } else {
             throw new IllegalArgumentException("Transaction with id " + id + " not found.");
-
-    
         }
-
     }
+
+
+    public List<Transaction> getTransactionByTransporter(User u){
+        return tranRepo.findTransactionsByTransportor(u);
+    }
+
+
+
+    public List<Transaction> getTransactionsByStatus(Transaction.Status s){
+        return tranRepo.findTransactionsByStatus(s);
+    }
+
     public void DeleteTransaction(Transaction transaction){
         tranRepo.delete(transaction);
     }

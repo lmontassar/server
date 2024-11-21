@@ -38,13 +38,14 @@ public class Transaction {
     private User seller;
 
     @ManyToOne
-    @JoinColumn(name = "transportor")
-    private User transportor;
+    @JoinColumn(name = "transporter")
+    private User transporter;
 
     private Date transaction_date;
     public enum Status {
-        DELIVRED,
+        DELIVERED,
         INPROGRESS,
+        NotStarted
     }
 
     @Enumerated(EnumType.STRING)

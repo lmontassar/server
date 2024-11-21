@@ -11,4 +11,7 @@ import com.backend.server.entity.User;
 public interface TransactionRepo extends JpaRepository<Transaction,Long> {
     public List<Transaction> findByBuyer(User u);
     public List<Transaction> findBySeller(User u);
+    public List<Transaction> findTransactionsByTransportor(User u);
+
+    public List<Transaction> findTransactionsByStatus(Transaction.Status status);
 }
