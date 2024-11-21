@@ -53,7 +53,7 @@ public class TransactionService {
 
 
     public List<Transaction> getTransactionByTransporter(User u){
-        return tranRepo.findTransactionsByTransportor(u);
+        return tranRepo.findTransactionsByTransporter(u);
     }
 
 
