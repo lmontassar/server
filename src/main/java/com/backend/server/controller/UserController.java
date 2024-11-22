@@ -90,6 +90,16 @@ public class UserController {
         }
     }
 
+    @GetMapping("/get/all/exceptadmins")
+    public ResponseEntity<?> getAllEexceptadmins(){
+        try{
+            List<User> u = userSer.findAllExceptAdmins() ;
+            return ResponseEntity.accepted().body(u);
+        }catch(Exception e){
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
     private String saveUserImage(MultipartFile image) throws IOException {
         // Define the directory where the images will be stored
         String uploadDir = "upload/avatar/";

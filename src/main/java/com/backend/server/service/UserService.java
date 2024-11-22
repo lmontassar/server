@@ -2,6 +2,7 @@ package com.backend.server.service;
 import org.springframework.beans.BeanUtils;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,12 @@ public class UserService {
     }
     public List<User> findAll(){
         return repo.findAll();
+    }
+    public List<User> findAllExceptAdmins(){
+        List<User.Role> l = new ArrayList<>();
+        l.add(User.Role.TRANSPORTER);
+        l.add(User.Role.USER);
+        return repo.findAllByRoleIn(l);
     }
     public User BlockById(Long id){
         User u = repo.findById(id).orElse(null);
