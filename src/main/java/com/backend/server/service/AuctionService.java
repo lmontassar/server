@@ -79,17 +79,20 @@ public class AuctionService {
                        if(Bought == 0){
                            User seller = auction.getSeller();
                            buyer.setAmount(buyer.getAmount()+auction.getParticipationPrice());
-                           buyer.setAmount((float) (buyer.getAmount()-b.getAmount()));
-                           seller.setAmount((float)(seller.getAmount()+b.getAmount()));
+                           buyer.setAmount((float)(buyer.getAmount() - b.getAmount()));
+                           seller.setAmount((float)(seller.getAmount() + b.getAmount()));
                            Transaction transaction = new Transaction();
+                           transaction.setCreation_date(new Date());
                            transaction.setBuyer(buyer);
+                           transaction.setTransporter_price(auction.getWeight()*0.85);
+                           transaction.setStatus(Status.NotStarted);
                            transaction.setAuction(auction);
                            transaction.setSeller(auction.getSeller());
-                           transaction.setStatus(Status.INPROGRESS);
                            transaction.setTransaction_date(new Date());
                            transaction.setAmount(b.getAmount());
                            transRepo.save(transaction);
                            userservice.save(seller);
+                           userservice.save(buyer);
                            emailService.sendEmail(
                                    buyer.getEmail(),
                                    "Congratulations! You've Won the Auction",
@@ -131,6 +134,7 @@ public class AuctionService {
            }
         }
     }
+
     public List<Auction> getAuctions() {
         return auctionRepo.findAll();
     }

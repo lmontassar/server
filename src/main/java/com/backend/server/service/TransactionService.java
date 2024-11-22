@@ -3,6 +3,8 @@ package com.backend.server.service;
 import java.util.List;
 
 import java.util.Optional;
+
+import com.backend.server.repository.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +20,8 @@ public class TransactionService {
     public TransactionService(TransactionRepo tranRepo) {
         this.tranRepo = tranRepo;
     }
+    @Autowired
+    private UserRepo userRepo;
 
     public List<Transaction> getTransactionByBuyer(User u) {
         return tranRepo.findByBuyer(u);
@@ -39,7 +43,7 @@ public class TransactionService {
         return tranRepo.save(transaction);
     }
 
-        public void changeStatus(Long id, Transaction.Status status) {
+    public void changeStatus(Long id, Transaction.Status status) {
         // Fetch the auction first
         Optional<Transaction> transactionOptional = tranRepo.findById(id);
         if (transactionOptional.isPresent()) {
@@ -48,11 +52,53 @@ public class TransactionService {
             tranRepo.save(transaction); // Save the updated auction
         } else {
             throw new IllegalArgumentException("Transaction with id " + id + " not found.");
-
-    
         }
-
     }
+    public Transaction cancelTransaction(Long tranId) {
+        Optional<Transaction> tr = tranRepo.findById(tranId);
+
+        if (tr.isPresent()) {
+            Transaction t = tr.get();
+
+            // Set transporter and update status
+
+            t.setStatus(Transaction.Status.NotStarted);
+            t.setTransporter(null);
+            // Save and return the updated transaction
+            return tranRepo.save(t);
+        } else {
+            throw new IllegalArgumentException("Transaction with id " + tranId );
+        }
+    }
+    public Transaction affectTransaction(Long tid, Long tranId) {
+        Optional<User> user = userRepo.findById(tid);
+        Optional<Transaction> tr = tranRepo.findById(tranId);
+
+        if (user.isPresent() && tr.isPresent()) {
+            User u = user.get();
+            Transaction t = tr.get();
+
+            // Set transporter and update status
+            t.setTransporter(u);
+            t.setStatus(Transaction.Status.INPROGRESS);
+
+            // Save and return the updated transaction
+            return tranRepo.save(t);
+        } else {
+            throw new IllegalArgumentException("Transaction with id " + tranId + " or User with id " + tid + " not found.");
+        }
+    }
+
+    public List<Transaction> getTransactionByTransporter(User u){
+        return tranRepo.findTransactionsByTransporter(u);
+    }
+    public List<Transaction> getAvailable(Long u){
+        return tranRepo.getAvailable(u);
+    }
+    public List<Transaction> getTransactionsByStatus(Transaction.Status s){
+        return tranRepo.findTransactionsByStatus(s);
+    }
+
     public void DeleteTransaction(Transaction transaction){
         tranRepo.delete(transaction);
     }

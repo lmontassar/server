@@ -71,9 +71,81 @@ public class TransactionController {
     }
 
 
-    @PutMapping("/change/{id}")
-    public void changeStatus(@PathVariable Long id) {
-        transactionService.changeStatus(id, Transaction.Status.DELIVRED);
+    @GetMapping("/get/transporter/{id}")
+    public ResponseEntity<?> getTransactionByTransporter(@PathVariable Long id){
+        User u = userService.findById(id);
+        List<Transaction> transactions = transactionService.getTransactionByTransporter(u);
+        if (!transactions.isEmpty()) {
+            return ResponseEntity.ok(transactions);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
+
+
+    @GetMapping("/available/{id}")
+    public ResponseEntity<?> getAvailableTransactions(@PathVariable Long id){
+        List<Transaction> transactions = transactionService.getAvailable(id);
+        if (!transactions.isEmpty()) {
+            return ResponseEntity.ok(transactions);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
+    @GetMapping("/inprogress")
+    public ResponseEntity<?> getInProgressTransactions(){
+        List<Transaction> transactions = transactionService.getTransactionsByStatus(Transaction.Status.INPROGRESS);
+        if (!transactions.isEmpty()) {
+            return ResponseEntity.ok(transactions);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
+    @GetMapping("/delivered")
+    public ResponseEntity<?> getDeliveredTransactions(){
+        List<Transaction> transactions = transactionService.getTransactionsByStatus(Transaction.Status.DELIVERED);
+        if (!transactions.isEmpty()) {
+            return ResponseEntity.ok(transactions);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
+
+    @PutMapping("/change/delivered/{id}")
+    public void Delivered(@PathVariable Long id) {
+        transactionService.changeStatus(id, Transaction.Status.DELIVERED);
+    }
+    @PutMapping("/{tid}/started/{id}")
+    public ResponseEntity<Transaction> started(@PathVariable Long tid, @PathVariable Long id) {
+        try {
+            // Call the affectTransaction service method and receive the updated transaction
+            Transaction updatedTransaction = transactionService.affectTransaction(tid, id);
+
+            // Return the updated transaction in the response with a 200 OK status
+            return ResponseEntity.ok(updatedTransaction);
+        } catch (IllegalArgumentException e) {
+            // Return a 404 Not Found status if the transaction or user is not found
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        } catch (Exception e) {
+            // Return a 500 Internal Server Error status for any other errors
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+    @PutMapping("/cancel/{id}")
+    public ResponseEntity<Transaction> cancel(@PathVariable Long id) {
+        try {
+            // Call the affectTransaction service method and receive the updated transaction
+            Transaction updatedTransaction = transactionService.cancelTransaction(id);
+
+            // Return the updated transaction in the response with a 200 OK status
+            return ResponseEntity.ok(updatedTransaction);
+        } catch (IllegalArgumentException e) {
+            // Return a 404 Not Found status if the transaction or user is not found
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        } catch (Exception e) {
+            // Return a 500 Internal Server Error status for any other errors
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
     
 
