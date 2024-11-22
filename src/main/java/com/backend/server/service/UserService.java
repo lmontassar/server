@@ -26,7 +26,9 @@ public class UserService {
         u.setStatus(User.Status.BLOCKED);
         return repo.save(u);
     }
-
+    public List<User> findAllByRole(User.Role role){
+        return repo.findAllByRole(role);
+    }
     public User findOrCreateUser(User u) {
         User existingUser = repo.findOneByEmail(u.getEmail());
         if (existingUser != null) {
@@ -38,7 +40,12 @@ public class UserService {
             return repo.save(u);
         }
     }
-
+    public User UpdateStatus(Long id,User.Status status){
+        User u = repo.findById(id).orElse(null);
+        if (u == null) return null;
+        u.setStatus(status);
+        return repo.save(u);
+    }
     public User updateById(Long id,User upUser){
         User u = repo.findById(id).orElse(null);
         if (u == null) return null;

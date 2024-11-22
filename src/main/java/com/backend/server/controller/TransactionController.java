@@ -83,9 +83,9 @@ public class TransactionController {
     }
 
 
-    @GetMapping("/available")
-    public ResponseEntity<?> getAvailableTransactions(){
-        List<Transaction> transactions = transactionService.getTransactionsByStatus(Transaction.Status.NotStarted);
+    @GetMapping("/available/{id}")
+    public ResponseEntity<?> getAvailableTransactions(@PathVariable Long id){
+        List<Transaction> transactions = transactionService.getAvailable(id);
         if (!transactions.isEmpty()) {
             return ResponseEntity.ok(transactions);
         } else {
@@ -115,9 +115,37 @@ public class TransactionController {
     public void Delivered(@PathVariable Long id) {
         transactionService.changeStatus(id, Transaction.Status.DELIVERED);
     }
-    @PutMapping("/change/started/{id}")
-    public void Started(@PathVariable Long id) {
-        transactionService.changeStatus(id, Transaction.Status.INPROGRESS);
+    @PutMapping("/{tid}/started/{id}")
+    public ResponseEntity<Transaction> started(@PathVariable Long tid, @PathVariable Long id) {
+        try {
+            // Call the affectTransaction service method and receive the updated transaction
+            Transaction updatedTransaction = transactionService.affectTransaction(tid, id);
+
+            // Return the updated transaction in the response with a 200 OK status
+            return ResponseEntity.ok(updatedTransaction);
+        } catch (IllegalArgumentException e) {
+            // Return a 404 Not Found status if the transaction or user is not found
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        } catch (Exception e) {
+            // Return a 500 Internal Server Error status for any other errors
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+    @PutMapping("/cancel/{id}")
+    public ResponseEntity<Transaction> cancel(@PathVariable Long id) {
+        try {
+            // Call the affectTransaction service method and receive the updated transaction
+            Transaction updatedTransaction = transactionService.cancelTransaction(id);
+
+            // Return the updated transaction in the response with a 200 OK status
+            return ResponseEntity.ok(updatedTransaction);
+        } catch (IllegalArgumentException e) {
+            // Return a 404 Not Found status if the transaction or user is not found
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        } catch (Exception e) {
+            // Return a 500 Internal Server Error status for any other errors
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
     
 

@@ -40,7 +40,7 @@ public class Transaction {
     @ManyToOne
     @JoinColumn(name = "transporter")
     private User transporter;
-
+    private Date creation_date;
     private Date transaction_date;
     public enum Status {
         DELIVERED,
@@ -54,6 +54,9 @@ public class Transaction {
 
     @Column(name = "amount", nullable = false)
     private double amount;
+
+    @Column(name = "transporter_price", nullable = false)
+    private double transporter_price;
 
     private String delivery_adress;
 }

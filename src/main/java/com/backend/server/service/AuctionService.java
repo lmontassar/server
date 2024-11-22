@@ -82,7 +82,9 @@ public class AuctionService {
                            buyer.setAmount((float)(buyer.getAmount() - b.getAmount()));
                            seller.setAmount((float)(seller.getAmount() + b.getAmount()));
                            Transaction transaction = new Transaction();
+                           transaction.setCreation_date(new Date());
                            transaction.setBuyer(buyer);
+                           transaction.setTransporter_price(auction.getWeight()*0.85);
                            transaction.setStatus(Status.NotStarted);
                            transaction.setAuction(auction);
                            transaction.setSeller(auction.getSeller());
@@ -132,6 +134,7 @@ public class AuctionService {
            }
         }
     }
+
     public List<Auction> getAuctions() {
         return auctionRepo.findAll();
     }

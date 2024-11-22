@@ -37,6 +37,9 @@ public class Auction {
     @Column(name = "current_price")
     private float currentPrice;
 
+    @Column(name = "weight")
+    private float weight;
+
     @Column(name = "start_time", nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private Date startTime;
