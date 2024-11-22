@@ -160,6 +160,61 @@ public class UserController {
         }
     }
 
+    @PostMapping("/transporter/add")
+    public ResponseEntity<?> addTransporter(
+            @RequestParam("username") String username,
+            @RequestParam("email") String email,
+            @RequestParam("password") String password,
+            @RequestParam("firstname") String firstname,
+            @RequestParam("lastname") String lastname,
+            @RequestParam("phoneNumber") String phoneNumber,
+            @RequestParam("address") String address,
+            @RequestParam("image") MultipartFile image // Add the image as MultipartFile
+    ) {
+        try {
+            // Check if the user already exists
+            if (userSer.findOneByEmail(email) != null || userSer.findOneByUsername(username) != null) {
+                JSONObject ExistResponse = new JSONObject();
+                ExistResponse.put("message", "Your e-mail or username is already used!");
+                ExistResponse.put("status", "error");
+                return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(ExistResponse.toString());
+            }
+            // Create a new user object
+            
+            User u = new User();
+            String pass = u.getPassword();
+            u.setUsername(username);
+            u.setEmail(email);
+            u.setPassword(bCryptPasswordEncoder.encode(password));
+            u.setFirstname(firstname);
+            u.setLastname(lastname);
+            u.setPhoneNumber(Integer.valueOf(phoneNumber));
+            u.setAddress(address);
+            u.setStatus(User.Status.ACTIVE); // Default status
+            u.setRole(User.Role.TRANSPORTER); // Default role
+            u.setCreatedAt(LocalDateTime.now());
+            
+            // After saving the user, process the image upload
+            if (image != null && !image.isEmpty()) {
+                u.setImageUrl(saveUserImage(image)); // Save image with user_id
+            }
+            userSer.save(u);
+            emailService.sendEmail(
+                u.getEmail(),
+                "Your account created successfuly",
+                "<p>Dear " + u.getFirstname()+" "+u.getLastname() +",</p>"
+                + "<p>We are pleased to inform you that your account was created successfuly</p>"
+                + "<p>As a transporter with S&D this is your login:</p>"
+                + "<p><strong>Username:</strong> " + u.getUsername() + "</p>"
+                + "<p><strong>Password:</strong> " + pass + "</p>"
+                + "<p>Please reset your password when you loggin in</p>"
+                + "<p>Warm regards,<br/>The S&D Team</p>"
+            );
+            return ResponseEntity.accepted().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
     
     @PostMapping("/login")
     public ResponseEntity<?> Login(@RequestBody LoginRequest l){
@@ -212,4 +267,18 @@ public class UserController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
+    @PutMapping("/status")
+    public ResponseEntity<?> ChangeStatus(@RequestParam("id") Long id){
+        try{
+            User up = userSer.findById(id);
+            if(up == null) return ResponseEntity.notFound().build();
+            up.setStatus( up.getStatus() == User.Status.ACTIVE ? User.Status.BLOCKED : User.Status.ACTIVE );
+            userSer.updateById(up.getId(), up);
+            return ResponseEntity.accepted().body(null);
+        } catch ( Exception e ) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
 }

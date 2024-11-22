@@ -8,4 +8,4 @@ import com.backend.server.entity.User;
 public interface UserRepo extends JpaRepository<User,Long> {
     public User findOneByEmail(String email);
     public User findOneByUsername(String username);
-}
+} 

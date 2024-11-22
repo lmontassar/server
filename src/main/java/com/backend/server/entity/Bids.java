@@ -1,6 +1,8 @@
 package com.backend.server.entity;
 
 import java.time.LocalDateTime;
+import java.util.List;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -32,6 +34,7 @@ public class Bids {
     private User buyer;
 
     private double amount;
+
 
     private LocalDateTime time;
 
