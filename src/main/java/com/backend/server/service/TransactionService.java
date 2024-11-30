@@ -43,13 +43,13 @@ public class TransactionService {
         return tranRepo.save(transaction);
     }
 
-    public void changeStatus(Long id, Transaction.Status status) {
+    public Transaction changeStatus(Long id, Transaction.Status status) {
         // Fetch the auction first
         Optional<Transaction> transactionOptional = tranRepo.findById(id);
         if (transactionOptional.isPresent()) {
             Transaction transaction = transactionOptional.get();
             transaction.setStatus(status);
-            tranRepo.save(transaction); // Save the updated auction
+            return tranRepo.save(transaction); // Save the updated auction
         } else {
             throw new IllegalArgumentException("Transaction with id " + id + " not found.");
         }
