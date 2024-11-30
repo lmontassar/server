@@ -233,6 +233,7 @@ public class UserController {
             if(l.getEmail() != null) u = userSer.findOneByEmail(l.getEmail()) ;
             else if(l.getUsername() != null)  u = userSer.findOneByUsername(l.getUsername()) ;
             else return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            if (u.getStatus() == User.Status.BLOCKED) return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
             if( bCryptPasswordEncoder.matches(l.getPassword(), u.getPassword()) ){
                 String jwt = myJwt.generateToken(u);
                 LoginResponse Lr = new LoginResponse(jwt,u);
