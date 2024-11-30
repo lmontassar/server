@@ -111,9 +111,9 @@ public class TransactionController {
         }
     }
 
-    @PutMapping("/change/delivered/{id}")
-    public void Delivered(@PathVariable Long id) {
-        transactionService.changeStatus(id, Transaction.Status.DELIVERED);
+    @PutMapping("/delivered/{id}")
+    public Transaction Delivered(@PathVariable Long id) {
+        return transactionService.changeStatus(id, Transaction.Status.DELIVERED);
     }
     @PutMapping("/{tid}/started/{id}")
     public ResponseEntity<?> started(@PathVariable Long tid, @PathVariable Long id) {
