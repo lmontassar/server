@@ -12,6 +12,7 @@ import com.backend.server.entity.User;
 public interface TransactionRepo extends JpaRepository<Transaction,Long> {
     public List<Transaction> findByBuyer(User u);
     public List<Transaction> findBySeller(User u);
+    public Transaction getTransactionById(Long id);
     @Query("SELECT t FROM Transaction t WHERE t.transporter.id = :tid AND FUNCTION('DATE', t.transaction_date) = CURRENT_DATE and t.status=com.backend.server.entity.Transaction.Status.DELIVERED")
     public List<Transaction> getTransactionByTransporterAndTodayDate(Long tid);
     public List<Transaction> findTransactionsByStatus(Transaction.Status status);

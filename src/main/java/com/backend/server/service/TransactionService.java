@@ -71,19 +71,16 @@ public class TransactionService {
         }
     }
     public Transaction affectTransaction(Long tid, Long tranId) {
-        Optional<User> user = userRepo.findById(tid);
-        Optional<Transaction> tr = tranRepo.findById(tranId);
-
-        if (user.isPresent() && tr.isPresent()) {
-            User u = user.get();
-            Transaction t = tr.get();
-
+        User user = userRepo.getUserById(tranId);
+        Transaction tr = tranRepo.getTransactionById(tid);
+        if (user!=null && tr!=null) {
             // Set transporter and update status
-            t.setTransporter(u);
-            t.setStatus(Transaction.Status.INPROGRESS);
+
+            tr.setTransporter(user);
+            tr.setStatus(Transaction.Status.INPROGRESS);
 
             // Save and return the updated transaction
-            return tranRepo.save(t);
+            return tranRepo.save(tr);
         } else {
             throw new IllegalArgumentException("Transaction with id " + tranId + " or User with id " + tid + " not found.");
         }

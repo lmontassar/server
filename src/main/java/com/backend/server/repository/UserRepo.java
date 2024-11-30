@@ -6,6 +6,7 @@ import com.backend.server.entity.User;
 import java.util.List;
 @Repository
 public interface UserRepo extends JpaRepository<User,Long> {
+    public User getUserById(Long id);
     public User findOneByEmail(String email);
     public User findOneByUsername(String username);
     public List<User> findAllByRole(User.Role role);

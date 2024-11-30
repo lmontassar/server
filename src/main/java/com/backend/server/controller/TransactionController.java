@@ -116,19 +116,18 @@ public class TransactionController {
         transactionService.changeStatus(id, Transaction.Status.DELIVERED);
     }
     @PutMapping("/{tid}/started/{id}")
-    public ResponseEntity<Transaction> started(@PathVariable Long tid, @PathVariable Long id) {
+    public ResponseEntity<?> started(@PathVariable Long tid, @PathVariable Long id) {
         try {
             // Call the affectTransaction service method and receive the updated transaction
             Transaction updatedTransaction = transactionService.affectTransaction(tid, id);
 
-            // Return the updated transaction in the response with a 200 OK status
             return ResponseEntity.ok(updatedTransaction);
         } catch (IllegalArgumentException e) {
             // Return a 404 Not Found status if the transaction or user is not found
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         } catch (Exception e) {
             // Return a 500 Internal Server Error status for any other errors
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
     @PutMapping("/cancel/{id}")
