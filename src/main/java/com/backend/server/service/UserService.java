@@ -68,16 +68,16 @@ public class UserService {
     public User findOneByUsername(String username){
         return repo.findOneByUsername(username);
     }
-    
+
     private String[] getNullPropertyNames(Object source) {
         return Arrays.stream(BeanUtils.getPropertyDescriptors(source.getClass()))
-                     .map(pd -> pd.getName())
-                     .filter(name -> {
-                         try {
-                             return BeanUtils.getPropertyDescriptor(source.getClass(), name).getReadMethod().invoke(source) == null;
-                         } catch (Exception e) {
-                             return false;
-                         }
-                     }).toArray(String[]::new);
+                .map(pd -> pd.getName())
+                .filter(name -> {
+                    try {
+                        return BeanUtils.getPropertyDescriptor(source.getClass(), name).getReadMethod().invoke(source) == null;
+                    } catch (Exception e) {
+                        return false;
+                    }
+                }).toArray(String[]::new);
     }
 }

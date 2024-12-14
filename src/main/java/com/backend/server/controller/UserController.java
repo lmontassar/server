@@ -10,7 +10,9 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
 
+import com.backend.server.entity.GoogleLoginRequest;
 import jakarta.mail.MessagingException;
+import lombok.NonNull;
 import org.json.JSONObject;
 import org.springframework.core.io.Resource; // For Resource type
 import org.springframework.core.io.UrlResource; // For UrlResource
@@ -18,6 +20,7 @@ import org.springframework.http.HttpHeaders; // For HTTP headers
 import org.springframework.http.ResponseEntity; // For ResponseEntity
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.lang.Nullable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.util.StringUtils;
 // For handling GET requests
@@ -55,7 +58,7 @@ public class UserController {
     @Autowired
     private JWT myJwt;
 
-    @Autowired 
+    @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Autowired
@@ -70,7 +73,7 @@ public class UserController {
             return "Failed to send email: " + e.getMessage();
         }
     }
-    
+
     @GetMapping("/get/{id}")
     public ResponseEntity<?> getOneById(@PathVariable ("id")Long id){
         try{
@@ -114,7 +117,7 @@ public class UserController {
 
         // Save the file to the target directory
         Files.copy(image.getInputStream(), Paths.get(uploadDir + newFilename), StandardCopyOption.REPLACE_EXISTING);
-        return newFilename;
+        return "/api/user/upload/avatar/"+newFilename;
     }
 
     @GetMapping("/upload/avatar/{imageName:.+}")
@@ -190,7 +193,7 @@ public class UserController {
                 return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(ExistResponse.toString());
             }
             // Create a new user object
-            
+
             User u = new User();
             String pass = u.getPassword();
             u.setUsername(username);
@@ -203,29 +206,29 @@ public class UserController {
             u.setStatus(User.Status.ACTIVE); // Default status
             u.setRole(User.Role.TRANSPORTER); // Default role
             u.setCreatedAt(LocalDateTime.now());
-            
+
             // After saving the user, process the image upload
             if (image != null && !image.isEmpty()) {
                 u.setImageUrl(saveUserImage(image)); // Save image with user_id
             }
             userSer.save(u);
             emailService.sendEmail(
-                u.getEmail(),
-                "Your account created successfuly",
-                "<p>Dear " + u.getFirstname()+" "+u.getLastname() +",</p>"
-                + "<p>We are pleased to inform you that your account was created successfuly</p>"
-                + "<p>As a transporter with S&D this is your login:</p>"
-                + "<p><strong>Username:</strong> " + u.getUsername() + "</p>"
-                + "<p><strong>Password:</strong> " + pass + "</p>"
-                + "<p>Please reset your password when you loggin in</p>"
-                + "<p>Warm regards,<br/>The S&D Team</p>"
+                    u.getEmail(),
+                    "Your account created successfuly",
+                    "<p>Dear " + u.getFirstname()+" "+u.getLastname() +",</p>"
+                            + "<p>We are pleased to inform you that your account was created successfuly</p>"
+                            + "<p>As a transporter with S&D this is your login:</p>"
+                            + "<p><strong>Username:</strong> " + u.getUsername() + "</p>"
+                            + "<p><strong>Password:</strong> " + pass + "</p>"
+                            + "<p>Please reset your password when you loggin in</p>"
+                            + "<p>Warm regards,<br/>The S&D Team</p>"
             );
             return ResponseEntity.accepted().build();
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
     }
-    
+
     @PostMapping("/login")
     public ResponseEntity<?> Login(@RequestBody LoginRequest l){
         try{
@@ -233,43 +236,83 @@ public class UserController {
             if(l.getEmail() != null) u = userSer.findOneByEmail(l.getEmail()) ;
             else if(l.getUsername() != null)  u = userSer.findOneByUsername(l.getUsername()) ;
             else return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-            if (u.getStatus() == User.Status.BLOCKED) return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            if (u.getStatus() == User.Status.BLOCKED) return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are blocked from the platform !!");
             if( bCryptPasswordEncoder.matches(l.getPassword(), u.getPassword()) ){
                 String jwt = myJwt.generateToken(u);
                 LoginResponse Lr = new LoginResponse(jwt,u);
                 return ResponseEntity.status(HttpStatus.ACCEPTED).body(Lr);
             } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found !!");
             }
         }catch(Exception e){
             return ResponseEntity.badRequest().build();
         }
     }
 
-    @GetMapping("/google-login")
-    public ResponseEntity<?> getUserInfo(@AuthenticationPrincipal OAuth2User principal) {
-        if (principal != null) {
-            String email = principal.getAttribute("email");
-            String lastname = principal.getAttribute("family_name");
-            String firstname = principal.getAttribute("given_name");
+    @PostMapping("/login-phone")
+    public ResponseEntity<?> LoginPhone(@RequestBody LoginRequest l){
+        try{
+            User u ;
+            if(l.getEmail() != null) u = userSer.findOneByEmail(l.getEmail()) ;
+            else if(l.getUsername() != null)  u = userSer.findOneByUsername(l.getUsername()) ;
+            else return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            if (u.getStatus() == User.Status.BLOCKED) return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are blocked from the platform !!");
+            if( bCryptPasswordEncoder.matches(l.getPassword(), u.getPassword()) ){
+                if (u.getRole() != User.Role.USER) return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not allowed to access the mobile version !!");
+                String jwt = myJwt.generateToken(u);
+                LoginResponse Lr = new LoginResponse(jwt,u);
+                return ResponseEntity.status(HttpStatus.ACCEPTED).body(Lr);
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found !!");
+            }
+        }catch(Exception e){
+            return ResponseEntity.badRequest().build();
+        }
+    }
 
+    @PostMapping("/google-login")
+    public ResponseEntity<?> handleGoogleLogin(@RequestBody GoogleLoginRequest authentication) {
+        if (authentication != null) {
             User userInfo = new User();
-            userInfo.setEmail(email);
-            userInfo.setFirstname(firstname);
-            userInfo.setLastname(lastname);
+            userInfo.setEmail(authentication.getEmail());
+            userInfo.setFirstname(authentication.getFirstname());
+            userInfo.setLastname(authentication.getLastname());
+            userInfo.setRole(User.Role.USER);
+            userInfo.setImageUrl(authentication.getImageUrl());
+            userInfo.setUsername(authentication.getUsername());
             User user = userSer.findOrCreateUser(userInfo);
-
+            if(user.getStatus() == User.Status.BLOCKED){
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User is blocked !!.");
+            }
             String jwtToken = myJwt.generateToken(user);
-            LoginResponse Lr = new LoginResponse(jwtToken,user);
-            return ResponseEntity.status(HttpStatus.ACCEPTED).body(Lr);
+            LoginResponse loginResponse = new LoginResponse(jwtToken, user);
+            return ResponseEntity.status(HttpStatus.ACCEPTED).body(loginResponse);
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User is not authenticated.");
     }
-    
+
     @PutMapping("/update/{id}")
-    public ResponseEntity<?> BlockOneById(@PathVariable("id") Long id,@RequestBody User u){
+    public ResponseEntity<?> editProfile(@PathVariable("id") Long id,
+                                         @RequestParam("username") String username,
+                                         @RequestParam("email") String email,
+                                         @RequestParam("password") String password,
+                                         @RequestParam("phoneNumber") String phoneNumber,
+                                         @RequestParam("address") String address,
+                                         @Nullable @RequestParam("image") MultipartFile image){
         try{
-            if(u.getPassword() != null)
+            User u =  userSer.findById(id);
+            u.setId(id);
+            u.setUsername(username);
+            u.setEmail(email);
+            u.setPhoneNumber(Integer.valueOf(phoneNumber));
+            u.setAddress(address);
+            if (image != null && !image.isEmpty()) {
+                String baseDirectory = "uploads/";
+                String oldImagePath = baseDirectory + u.getImageUrl().replace("/api/user/", "");
+                Files.deleteIfExists(Paths.get(oldImagePath));
+                u.setImageUrl(saveUserImage(image)); // Save image with user_id
+            }
+            if(password.length() > 1)
                 u.setPassword(bCryptPasswordEncoder.encode(u.getPassword()));
             User UserAfterUpdates = userSer.updateById(id,u);
             return ResponseEntity.accepted().body(UserAfterUpdates);

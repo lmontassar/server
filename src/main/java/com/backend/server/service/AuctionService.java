@@ -80,7 +80,7 @@ public class AuctionService {
                            User seller = auction.getSeller();
                            buyer.setAmount(buyer.getAmount()+auction.getParticipationPrice());
                            buyer.setAmount((float)(buyer.getAmount() - b.getAmount()));
-                           seller.setAmount((float)(seller.getAmount() + b.getAmount()));
+
                            Transaction transaction = new Transaction();
                            transaction.setCreation_date(new Date());
                            transaction.setBuyer(buyer);

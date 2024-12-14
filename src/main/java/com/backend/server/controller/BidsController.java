@@ -63,6 +63,7 @@ public class BidsController {
     @PostMapping("/add")
     public ResponseEntity<?> addBid(@RequestBody Bids bid) {
         try {
+
             Bids b = bidService.addBid(bid);
             Auction auction = auctionService.getAuction((b.getAuction()).getId());
             emailService.sendEmail(
