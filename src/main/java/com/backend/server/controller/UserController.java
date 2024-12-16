@@ -300,6 +300,7 @@ public class UserController {
                                          @RequestParam("address") String address,
                                          @Nullable @RequestParam("image") MultipartFile image){
         try{
+            System.out.println(image);
             User u =  userSer.findById(id);
             u.setId(id);
             u.setUsername(username);
@@ -307,9 +308,12 @@ public class UserController {
             u.setPhoneNumber(Integer.valueOf(phoneNumber));
             u.setAddress(address);
             if (image != null && !image.isEmpty()) {
-                String baseDirectory = "uploads/";
-                String oldImagePath = baseDirectory + u.getImageUrl().replace("/api/user/", "");
-                Files.deleteIfExists(Paths.get(oldImagePath));
+
+                if(u.getImageUrl()!=null && u.getImageUrl().charAt(0)!='h'){
+                    String baseDirectory = "uploads/";
+                    String oldImagePath = baseDirectory + u.getImageUrl().replace("/api/user/", "");
+                    Files.deleteIfExists(Paths.get(oldImagePath));
+                }
                 u.setImageUrl(saveUserImage(image)); // Save image with user_id
             }
             if(password.length() > 1)
