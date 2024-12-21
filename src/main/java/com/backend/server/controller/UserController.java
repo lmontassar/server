@@ -10,7 +10,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
 
-import com.backend.server.entity.GoogleLoginRequest;
+import com.backend.server.entity.*;
+import com.backend.server.service.VerificatioCodeService;
 import jakarta.mail.MessagingException;
 import lombok.NonNull;
 import org.json.JSONObject;
@@ -28,9 +29,6 @@ import org.springframework.util.StringUtils;
 // For marking the class as a REST controller
 import org.springframework.web.bind.annotation.*;
 import com.backend.server.config.JWT;
-import com.backend.server.entity.LoginRequest;
-import com.backend.server.entity.LoginResponse;
-import com.backend.server.entity.User;
 import com.backend.server.service.EmailService;
 import com.backend.server.service.UserService;
 
@@ -63,6 +61,9 @@ public class UserController {
 
     @Autowired
     private EmailService emailService;
+
+    @Autowired
+    private VerificatioCodeService verificatioCodeService;
 
     @PostMapping("/send-email")
     public String sendEmail(@RequestBody EmailRequest request) {
@@ -324,6 +325,35 @@ public class UserController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+    @PostMapping("/forgot-password")
+    public ResponseEntity<String> createVerificationCode(@RequestParam("email") String email){
+        try{
+            String verificationCodeMessage = verificatioCodeService.addCode(email);
+            if(verificationCodeMessage.equals("Code Created Successfully")){
+                return ResponseEntity.ok().body("Code Sent to Your email");
+            }else{
+                return ResponseEntity.badRequest().body(verificationCodeMessage);
+            }
+
+        } catch (MessagingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    @PutMapping("/reset-password")
+    public ResponseEntity<?> changePassword(@RequestParam("code") String code,@RequestParam("newPassword") String password){
+        String email = verificatioCodeService.getEmail(code);
+        if(email!=null){
+            User user = userSer.findOneByEmail(email);
+            if(password.length() > 1)
+                user.setPassword(bCryptPasswordEncoder.encode(password));
+            userSer.updateById(user.getId(),user);
+            verificatioCodeService.deleteCode(code);
+            return ResponseEntity.ok().body("Password changed Successfully");
+        }
+        return ResponseEntity.badRequest().body("Link is incorrect !");
+
+    }
+
 
     @PutMapping("/status")
     public ResponseEntity<?> ChangeStatus(@RequestParam("id") Long id){

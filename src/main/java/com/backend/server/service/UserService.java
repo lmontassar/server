@@ -37,7 +37,7 @@ public class UserService {
         return repo.findAllByRole(role);
     }
     public User findOrCreateUser(User u) {
-        User existingUser = repo.findOneByEmail(u.getEmail());
+        User existingUser = repo.findOneByEmail(u.getEmail()).orElse(null);
         if (existingUser != null) {
             return existingUser;
         } else {
@@ -63,7 +63,7 @@ public class UserService {
         return repo.save(u);
     }
     public User findOneByEmail(String email){
-        return repo.findOneByEmail(email);
+        return repo.findOneByEmail(email).orElse(null);
     }
     public User findOneByUsername(String username){
         return repo.findOneByUsername(username);
