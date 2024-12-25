@@ -25,6 +25,8 @@ public class TransporterService {
     private EmailService emailService;
     @Autowired
     private UserService userservice;
+
+
     @Scheduled(cron = "0 55 23 * * ?")
     public void closeDayTransaction() {
         try {

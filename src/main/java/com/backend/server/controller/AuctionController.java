@@ -1,14 +1,22 @@
 package com.backend.server.controller;
 
 import com.backend.server.entity.Auction;
+import com.backend.server.entity.Notifications;
+import com.backend.server.entity.User;
 import com.backend.server.service.AuctionService;
+import com.backend.server.service.NotificationsService;
+import com.backend.server.service.UserService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity; // For ResponseEntity
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import javax.management.Notification;
 
 @RestController
 @RequestMapping(path = "/auction")
@@ -16,6 +24,27 @@ public class AuctionController {
 
     @Autowired
     private AuctionService auctionService;
+
+    @Autowired
+    private NotificationsService nService;
+
+    @Autowired
+    private UserService uService;
+
+    @GetMapping("/get/notifications/user/{id}")
+    public ResponseEntity<?> getNotifications(@PathVariable Long id){
+        try{
+            User Client = uService.findById(id);
+            List<Notifications> n = nService.GetNotificationByUser(Client);
+            List<String> s = new ArrayList<>();
+            for (Notifications i : n) {
+                s.add(i.getMessage());
+            }
+            return ResponseEntity.accepted().body(s);
+        }catch(Exception e){
+            return ResponseEntity.badRequest().build();
+        }
+    }
 
     @GetMapping("/all")
     public ResponseEntity<?> getAll(){

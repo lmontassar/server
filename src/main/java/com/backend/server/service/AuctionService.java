@@ -31,7 +31,9 @@ public class AuctionService {
     private EmailService emailService;
     @Autowired
     private UserService userservice;
-   
+    @Autowired
+    private NotificationsService nService;
+
     @Scheduled(fixedRate = 5000) // Check every minute
     public void closeExpiredAuctions() {
         LocalDateTime nowLocalDateTime = LocalDateTime.now();
@@ -63,6 +65,7 @@ public class AuctionService {
                                        + "<p>Thank you for using our platform. Please feel free to check your account for the final bid details or any further actions.</p>"
                                        + "<p>Best regards,<br/>S&D Team</p>"
                        );
+                       nService.AddNotification(buyer, "You lost the bid of Auction " + auction.getTitle());
                    }
                    if(b.getAmount()>buyer.getAmount() && Bought == 0){
                        emailService.sendEmail(
@@ -75,6 +78,7 @@ public class AuctionService {
                                        + "<p>Thank you for using our platform. Please feel free to check your account for the final bid details or any further actions.</p>"
                                        + "<p>Best regards,<br/>S&D Team</p>"
                        );
+                       nService.AddNotification(buyer, "You lost the bid of Auction " + auction.getTitle());
                    }else{
                        if(Bought == 0){
                            User seller = auction.getSeller();
@@ -103,6 +107,10 @@ public class AuctionService {
                                            + "<p>Thank you for participating, and congratulations on your win!</p>"
                                            + "<p>Best regards,<br/>S&D Team</p>"
                            );
+                           nService.AddNotification(buyer, "Congratulations! You've Won the Auction " + auction.getTitle());
+
+
+
                            emailService.sendEmail(
                                    auction.getSeller().getEmail(),
                                    "Auction Ended Notification",
@@ -112,6 +120,8 @@ public class AuctionService {
                                            + "<p>Thank you for using our platform. Please feel free to check your account for the final bid details or any further actions.</p>"
                                            + "<p>Best regards,<br/>S&D Team</p>"
                            );
+                           nService.AddNotification(auction.getSeller(), "Your auction "+auction.getTitle() +" has ended, bought by " +buyer.getFirstname()+" "+buyer.getLastname() );
+
                            Bought = 1;
                        }
                    }
@@ -128,6 +138,8 @@ public class AuctionService {
                                    + "<p>Thank you for using our platform. Please feel free to check your account for the final bid details or any further actions.</p>"
                                    + "<p>Best regards,<br/>S&D Team</p>"
                    );
+
+                   nService.AddNotification(auction.getSeller(), "Sorry to inform you that your auction "+auction.getTitle() +" has been canceled" );
                }
            }catch (Exception e){
                System.out.println(e.getMessage());

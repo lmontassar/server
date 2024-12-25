@@ -19,7 +19,6 @@ import io.jsonwebtoken.security.Keys;
 public class JWT {
     private static final long EXPIRATION_TIME = 864_000_000; //10 days
     private static final String secretKey = "ezbiderel3ankaboutezbiderel3ankabouttiriritiriritiri";
-  
    
     public JWT(){
         try{
